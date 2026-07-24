@@ -466,6 +466,43 @@ body{
     font-weight:bold;
     text-align:right;
 }
+
+.overlay{
+    display:none;
+    position:fixed;
+    top:60px; left:0;
+    width:100%; height:100%;
+    background:rgba(0,0,0,0.3);
+    z-index:100;
+}
+
+/* Below this width the sidebar no longer fits alongside content (it was
+   permanently reserving 220px of a flex row, leaving too little room for
+   the stat cards / heatmap and causing horizontal clipping). Turn it into
+   a slide-in overlay instead, like the driver/customer dashboards already do.
+   Note: within this breakpoint only, "collapsed" is repurposed to mean
+   "sidebar is open" (the toggle button just flips the same class either way). */
+@media (max-width:768px){
+    .sidebar{
+        position:fixed;
+        top:60px; left:0;
+        height:calc(100vh - 60px);
+        z-index:110;
+        transform:translateX(-100%);
+        width:220px;
+        overflow-y:auto;
+    }
+    .sidebar.collapsed{
+        transform:translateX(0);
+        width:220px;
+        padding:20px 0;
+    }
+    .overlay.show{ display:block; }
+}
+
+@media (max-width:480px){
+    .req-grid, .driver-list{ grid-template-columns:1fr; }
+}
 </style>
 </head>
 
@@ -485,6 +522,8 @@ if(!user || user.role !== "admin"){
     </div>
     <button type="button" class="logout-btn" onclick="logout()">Logout</button>
 </div>
+
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
 <div class="layout">
 
@@ -676,6 +715,12 @@ function logout(){
 
 function toggleSidebar(){
     document.getElementById("sidebar").classList.toggle("collapsed");
+    document.getElementById("overlay").classList.toggle("show");
+}
+
+function closeSidebar(){
+    document.getElementById("sidebar").classList.remove("collapsed");
+    document.getElementById("overlay").classList.remove("show");
 }
 
 function showPanel(name){
@@ -686,6 +731,7 @@ function showPanel(name){
     if(map[name] !== undefined){
         document.querySelectorAll(".sidebar-item")[map[name]].classList.add("active");
     }
+    closeSidebar();
     if(name === "overview") initHeatmap();
 }
 

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sanitation System - Login</title>
 
 <style>
@@ -36,9 +37,13 @@ body{
 
 .main{
     display:flex;
+    flex-wrap:wrap;
     justify-content:space-around;
     align-items:center;
-    height:80vh;
+    gap:30px;
+    min-height:80vh;
+    padding:20px 40px;
+    box-sizing:border-box;
 }
 
 .left{ width:40%; }
@@ -47,10 +52,18 @@ body{
 
 .box{
     width:320px;
+    max-width:100%;
+    box-sizing:border-box;
     background:rgba(255,255,255,0.1);
     backdrop-filter:blur(10px);
     padding:30px;
     border-radius:15px;
+}
+
+@media (max-width:768px){
+    .main{ flex-direction:column; text-align:center; padding:30px 20px; }
+    .left{ width:100%; }
+    .box{ width:100%; max-width:360px; }
 }
 
 input{
