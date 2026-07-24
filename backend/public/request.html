@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>New Request</title>
+
+<style>
+body{
+    font-family:'Segoe UI';
+    background:linear-gradient(to right,#e8f5e9,#eef2f5);
+    margin:0;
+}
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px 40px;
+    background:rgba(46,125,50,0.9);
+    color:white;
+}
+
+.header-right{
+    display:flex;
+    gap:10px;
+    align-items:center;
+}
+
+.header a{
+    text-decoration:none;
+    background:white;
+    color:#2e7d32;
+    padding:8px 15px;
+    border-radius:8px;
+    font-weight:bold;
+}
+
+.lang-btn{
+    background:white;
+    color:#2e7d32;
+    border:none;
+    padding:5px 10px;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+.container{
+    width:60%;
+    margin:40px auto;
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 5px 20px rgba(0,0,0,0.1);
+}
+
+.row{display:flex;gap:15px;}
+.input-group{flex:1;margin-bottom:15px;}
+
+input, select{
+    width:100%;
+    padding:12px;
+    border-radius:8px;
+    border:1px solid #ccc;
+    box-sizing:border-box;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    background:#2e7d32;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    margin-top:10px;
+}
+
+.location-box{
+    margin-top:10px;
+    padding:10px;
+    background:#e3f2fd;
+    border-radius:8px;
+    font-size:13px;
+}
+
+.price-box{
+    margin-top:10px;
+    padding:12px;
+    background:#fff3e0;
+    border-radius:8px;
+    font-weight:bold;
+    color:#e65100;
+}
+
+.payment-options{
+    margin-top:15px;
+}
+
+.payment-options label{
+    display:block;
+    margin-bottom:5px;
+}
+</style>
+</head>
+
+<body>
+
+<script>
+// CHECK LOGIN KWANZA
+const userData = JSON.parse(localStorage.getItem("user"));
+
+if(!userData){
+    window.location.href = "login.html";
+}
+</script>
+
+<div class="header">
+    <h2>Sanitation Request</h2>
+    <div class="header-right">
+        <a href="index.html">Home</a>
+    </div>
+</div>
+
+<div class="container">
+
+<h2>New Request</h2>
+<p>Select service and payment method</p>
+
+<form id="form">
+
+<div class="row">
+    <div class="input-group">
+        <input type="text" id="name" placeholder="Full Name" required>
+    </div>
+    <div class="input-group">
+        <input type="text" id="phone" placeholder="Phone Number" required>
+    </div>
+</div>
+
+<div class="input-group">
+    <select id="service" required onchange="setPrice()">
+        <option value="">Select Service</option>
+        <option>Septic Tank</option>
+        <option>Pit Latrine</option>
+    </select>
+</div>
+
+<div id="priceBox" class="price-box">
+    Amount: 0 TZS
+</div>
+
+<div class="payment-options">
+    <label>
+        <input type="radio" name="paymentMethod" value="cash" checked>
+        Pay Cash
+    </label>
+    <label>
+        <input type="radio" name="paymentMethod" value="online">
+        Pay Online
+    </label>
+</div>
+
+<button type="button" onclick="getLocation()">Get Location</button>
+
+<div id="locationBox" class="location-box">
+    Location not captured
+</div>
+
+<button type="submit">Submit Request</button>
+
+</form>
+
+</div>
+
+<script>
+
+const API = "";
+
+function authHeader(){
+    const u = JSON.parse(localStorage.getItem("user"));
+    return u && u.token ? { "Authorization": "Bearer " + u.token } : {};
+}
+
+// PRICE SYSTEM
+let prices = {
+    "Septic Tank": 50000,
+    "Pit Latrine": 30000
+};
+
+let selectedAmount = 0;
+
+function setPrice(){
+    let service = document.getElementById("service").value;
+    selectedAmount = prices[service] || 0;
+    document.getElementById("priceBox").innerText =
+        "Amount: " + selectedAmount.toLocaleString() + " TZS";
+}
+
+// LOCATION
+let lat = null;
+let lng = null;
+
+function getLocation(){
+    if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(function(pos){
+            lat = pos.coords.latitude;
+            lng = pos.coords.longitude;
+            document.getElementById("locationBox").innerHTML =
+            "Location captured successfully "
+        }, function(){
+            alert("Could not get location. Please allow location access.");
+        });
+    } else {
+        alert("Geolocation not supported by your browser.");
+    }
+}
+
+// SUBMIT
+document.getElementById("form").onsubmit = async function(e){
+    e.preventDefault();
+
+    if(lat === null){
+        alert("Please get location first!");
+        return;
+    }
+
+    // PATA USERNAME KWA NJIA MBILI
+    const userData = JSON.parse(localStorage.getItem("user"));
+    const currentUser = userData ? userData.username : null;
+
+    if(!currentUser){
+        alert("Login first!");
+        window.location.href = "login.html";
+        return;
+    }
+
+    let service = document.getElementById("service").value;
+
+    if(!service){
+        alert("Please select a service!");
+        return;
+    }
+
+    let paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+
+    let payload = {
+        user: currentUser,
+        name: document.getElementById("name").value,
+        phone: document.getElementById("phone").value,
+        service: service,
+        amount: selectedAmount,
+        paymentMethod: paymentMethod,
+        lat: lat,
+        lng: lng
+    };
+
+    console.log("Sending request:", payload);
+
+    try{
+        let res = await fetch(`${API}/api/requests`,{
+            method:"POST",
+            headers:{ "Content-Type":"application/json", ...authHeader() },
+            body: JSON.stringify(payload)
+        });
+
+        let data = await res.json();
+
+        console.log("Response:", data);
+
+        if(data.success){
+            alert("✅ Request submitted successfully!");
+            window.location.href = "index.html";
+        } else {
+            alert("Failed: " + (data.error || "Unknown error"));
+        }
+
+    }catch(err){
+        alert("Server error!");
+        console.log(err);
+    }
+};
+</script>
+
+</body>
+</html>

@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Dashboard</title>
+
+<style>
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+body{
+    font-family:'Segoe UI', sans-serif;
+    background:#f0f2f5;
+    color:#333;
+}
+
+.topbar{
+    background:linear-gradient(135deg,#1b5e20,#2e7d32);
+    color:white;
+    padding:0 25px;
+    height:60px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    position:fixed;
+    top:0; left:0; right:0;
+    z-index:100;
+    box-shadow:0 2px 10px rgba(0,0,0,0.2);
+}
+
+.topbar-left{ display:flex; align-items:center; gap:15px; }
+
+.menu-btn{
+    background:none;
+    border:none;
+    color:white;
+    font-size:22px;
+    cursor:pointer;
+    padding:5px;
+}
+
+.topbar h2{ font-size:18px; margin:0; }
+
+.topbar-right{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.lang-btns{ display:flex; gap:5px; }
+
+.lang-btn{
+    padding:4px 10px;
+    border:1px solid rgba(255,255,255,0.4);
+    border-radius:5px;
+    background:rgba(255,255,255,0.1);
+    color:white;
+    cursor:pointer;
+    font-size:12px;
+}
+
+.lang-btn:hover{ background:rgba(255,255,255,0.25); }
+
+.notif-bell{
+    position:relative;
+    cursor:pointer;
+    font-size:22px;
+}
+
+.notif-dot{
+    position:absolute;
+    top:-4px; right:-4px;
+    background:red;
+    color:white;
+    border-radius:50%;
+    width:18px; height:18px;
+    font-size:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+}
+
+.notif-dropdown{
+    display:none;
+    position:absolute;
+    top:55px; right:15px;
+    width:320px;
+    background:white;
+    border-radius:12px;
+    box-shadow:0 8px 30px rgba(0,0,0,0.15);
+    z-index:200;
+    overflow:hidden;
+}
+
+.notif-dropdown.show{ display:block; }
+
+.notif-header{
+    padding:15px 20px;
+    background:#1b5e20;
+    color:white;
+    font-weight:bold;
+    font-size:14px;
+}
+
+.notif-list{ max-height:350px; overflow-y:auto; }
+
+.notif-item{
+    padding:12px 15px;
+    border-bottom:1px solid #f0f0f0;
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+    cursor:pointer;
+    transition:background 0.2s;
+}
+
+.notif-item:hover{ background:#f9f9f9; }
+.notif-item.completed{ border-left:4px solid #2e7d32; }
+.notif-item.payment{ border-left:4px solid #1565c0; }
+.notif-item.assigned{ border-left:4px solid orange; }
+
+.notif-body h4{ font-size:13px; color:#333; margin-bottom:2px; }
+.notif-body p{ font-size:12px; color:#888; }
+
+.notif-empty{
+    padding:30px;
+    text-align:center;
+    color:#aaa;
+    font-size:13px;
+}
+
+.sidebar{
+    position:fixed;
+    top:60px; left:0;
+    width:240px;
+    height:calc(100vh - 60px);
+    background:white;
+    box-shadow:2px 0 10px rgba(0,0,0,0.05);
+    padding:20px 0;
+    z-index:90;
+    transform:translateX(-240px);
+    transition:transform 0.3s;
+    overflow-y:auto;
+}
+
+.sidebar.open{ transform:translateX(0); }
+
+.sidebar-user{
+    padding:15px 20px 20px;
+    border-bottom:1px solid #f0f0f0;
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.avatar{
+    width:45px; height:45px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#2e7d32,#66bb6a);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:white;
+    font-size:20px;
+    font-weight:bold;
+}
+
+.sidebar-user-info h4{ font-size:14px; margin:0; color:#333; }
+.sidebar-user-info p{ font-size:12px; color:#888; margin:2px 0 0; }
+
+.sidebar-menu{ padding:10px 0; }
+
+.sidebar-item{
+    padding:13px 20px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    cursor:pointer;
+    color:#555;
+    font-size:14px;
+    border-left:3px solid transparent;
+    transition:all 0.2s;
+}
+
+.sidebar-item:hover{
+    background:#f0f7f0;
+    color:#2e7d32;
+}
+
+.sidebar-item.active{
+    background:#e8f5e9;
+    color:#2e7d32;
+    border-left-color:#2e7d32;
+    font-weight:bold;
+}
+
+.sidebar-divider{
+    height:1px;
+    background:#f0f0f0;
+    margin:10px 20px;
+}
+
+.whatsapp-btn{
+    margin:15px 15px 5px;
+    padding:12px;
+    background:#25d366;
+    color:white;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:bold;
+    width:calc(100% - 30px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    text-decoration:none;
+}
+
+.whatsapp-btn:hover{ background:#1ebe5d; }
+
+.logout-side{
+    margin:8px 15px;
+    padding:12px;
+    background:#ffebee;
+    color:#c62828;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:bold;
+    width:calc(100% - 30px);
+}
+
+.overlay{
+    display:none;
+    position:fixed;
+    top:60px; left:0;
+    width:100%; height:100%;
+    background:rgba(0,0,0,0.3);
+    z-index:80;
+}
+
+.overlay.show{ display:block; }
+
+.main{
+    margin-top:60px;
+    padding:25px;
+    transition:margin-left 0.3s;
+}
+
+.panel{ display:none; }
+.panel.active{ display:block; }
+
+.stat-cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:15px;
+    margin-bottom:25px;
+}
+
+.stat-card{
+    background:white;
+    padding:18px;
+    border-radius:12px;
+    text-align:center;
+    box-shadow:0 2px 8px rgba(0,0,0,0.06);
+    border-top:4px solid #2e7d32;
+}
+
+.stat-card.orange{ border-top-color:orange; }
+.stat-card.blue{ border-top-color:#1565c0; }
+.stat-card.purple{ border-top-color:#6a1b9a; }
+
+.stat-card .s-num{
+    font-size:28px;
+    font-weight:bold;
+    color:#333;
+    margin:5px 0;
+}
+
+.stat-card .s-label{
+    font-size:12px;
+    color:#888;
+    text-transform:uppercase;
+}
+
+.section-title{
+    font-size:16px;
+    font-weight:bold;
+    color:#1b5e20;
+    margin-bottom:12px;
+    padding-bottom:8px;
+    border-bottom:2px solid #e8f5e9;
+}
+
+.tracker{
+    background:white;
+    border-radius:12px;
+    padding:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.06);
+    margin-bottom:20px;
+}
+
+.tracker-req{
+    margin-bottom:25px;
+    padding-bottom:20px;
+    border-bottom:1px solid #f0f0f0;
+}
+
+.tracker-req:last-child{ border-bottom:none; margin-bottom:0; }
+
+.tracker-req h4{
+    margin:0 0 15px;
+    color:#333;
+    font-size:15px;
+}
+
+.progress-steps{
+    display:flex;
+    align-items:center;
+    gap:0;
+}
+
+.step{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    flex:1;
+}
+
+.step-circle{
+    width:36px; height:36px;
+    border-radius:50%;
+    background:#e0e0e0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:16px;
+    color:#999;
+    font-weight:bold;
+}
+
+.step-circle.done{
+    background:#2e7d32;
+    color:white;
+}
+
+.step-circle.active{
+    background:orange;
+    color:white;
+}
+
+.step-label{
+    font-size:11px;
+    color:#888;
+    margin-top:5px;
+    text-align:center;
+}
+
+.step-label.done{ color:#2e7d32; font-weight:bold; }
+.step-label.active{ color:orange; font-weight:bold; }
+
+.step-line{
+    flex:1;
+    height:3px;
+    background:#e0e0e0;
+    margin-top:-20px;
+}
+
+.step-line.done{ background:#2e7d32; }
+
+.driver-assigned{
+    margin-top:12px;
+    padding:10px 15px;
+    background:#e8f5e9;
+    border-radius:8px;
+    font-size:13px;
+    color:#2e7d32;
+    font-weight:bold;
+}
+
+.req-item{
+    background:white;
+    padding:18px;
+    margin-bottom:12px;
+    border-radius:12px;
+    border-left:5px solid #2e7d32;
+    box-shadow:0 2px 8px rgba(0,0,0,0.06);
+}
+
+.req-item.pending-item{ border-left-color:orange; }
+.req-item.completed-item{ border-left-color:#2e7d32; }
+
+.req-item h4{ margin:0 0 8px; color:#333; }
+.req-item p{ font-size:13px; color:#666; margin:3px 0; }
+
+.tag{
+    display:inline-block;
+    padding:3px 10px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:bold;
+    margin-top:6px;
+    margin-right:4px;
+}
+
+.tag.pending{ background:#fff3e0; color:orange; }
+.tag.completed{ background:#e8f5e9; color:#2e7d32; }
+.tag.unpaid{ background:#ffebee; color:#c62828; }
+.tag.paid{ background:#e8f5e9; color:#2e7d32; }
+
+.fab{
+    position:fixed;
+    bottom:25px; right:25px;
+    width:56px; height:56px;
+    background:#2e7d32;
+    color:white;
+    border:none;
+    border-radius:50%;
+    font-size:28px;
+    cursor:pointer;
+    box-shadow:0 4px 15px rgba(46,125,50,0.4);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:50;
+    transition:transform 0.2s;
+}
+
+.fab:hover{ transform:scale(1.1); }
+
+.empty{
+    text-align:center;
+    padding:40px;
+    color:#aaa;
+}
+
+.empty .e-icon{ font-size:48px; margin-bottom:10px; }
+</style>
+</head>
+
+<body>
+
+<script>
+const userData = JSON.parse(localStorage.getItem("user"));
+if(!userData){ window.location.href = "login.html"; }
+else if(userData.role === "admin"){ window.location.href = "admin.html"; }
+else if(userData.role === "driver"){ window.location.href = "driver.html"; }
+</script>
+
+<div class="topbar">
+    <div class="topbar-left">
+        <button type="button" class="menu-btn" onclick="toggleSidebar()">&#9776;</button>
+        <h2 id="topTitle">My Dashboard</h2>
+    </div>
+    <div class="topbar-right">
+        <div class="lang-btns">
+            <button type="button" class="lang-btn" onclick="setLang('en')">EN</button>
+            <button type="button" class="lang-btn" onclick="setLang('sw')">SW</button>
+        </div>
+        <div class="notif-bell" onclick="toggleNotif()">
+            &#128276;
+            <div class="notif-dot" id="notifDot" style="display:none;">0</div>
+        </div>
+    </div>
+</div>
+
+<div class="notif-dropdown" id="notifDropdown">
+    <div class="notif-header">Notifications</div>
+    <div class="notif-list" id="notifList">
+        <div class="notif-empty">No notifications yet</div>
+    </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-user">
+        <div class="avatar" id="avatarLetter">U</div>
+        <div class="sidebar-user-info">
+            <h4 id="sidebarUsername">User</h4>
+            <p>Customer</p>
+        </div>
+    </div>
+
+    <div class="sidebar-menu">
+        <div class="sidebar-item active" onclick="showPanel('home'); closeSidebar();">
+            <span id="menuHome">Home</span>
+        </div>
+        <div class="sidebar-item" onclick="showPanel('track'); closeSidebar();">
+            <span id="menuTrack">Track Request</span>
+        </div>
+        <div class="sidebar-item" onclick="showPanel('history'); closeSidebar();">
+            <span id="menuHistory">My Requests</span>
+        </div>
+        <div class="sidebar-item" onclick="window.location.href='request.html'; closeSidebar();">
+            <span id="menuNew">New Request</span>
+        </div>
+
+        <div class="sidebar-divider"></div>
+
+        <a class="whatsapp-btn" href="https://wa.me/255755067745?text=Hello%2C%20I%20need%20help%20with%20sanitation%20services." target="_blank">
+            Contact via WhatsApp
+        </a>
+
+        <button type="button" class="logout-side" onclick="logout()">Logout</button>
+    </div>
+</div>
+
+<div class="main">
+
+    <div class="panel active" id="panel-home">
+
+        <div class="stat-cards">
+            <div class="stat-card blue">
+                <div class="s-label" id="labelTotal">Total</div>
+                <div class="s-num" id="total">0</div>
+            </div>
+            <div class="stat-card orange">
+                <div class="s-label" id="labelPending">Pending</div>
+                <div class="s-num" id="pending">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="s-label" id="labelCompleted">Completed</div>
+                <div class="s-num" id="completed">0</div>
+            </div>
+            <div class="stat-card purple">
+                <div class="s-label" id="labelSpent">Total Spent</div>
+                <div class="s-num" id="totalSpent">0</div>
+            </div>
+        </div>
+
+        <div class="section-title" id="activeTitle">Active Jobs</div>
+        <div id="activeJobs"></div>
+
+        <div class="section-title" style="margin-top:20px;" id="recentTitle">Recent Requests</div>
+        <div id="recentList"></div>
+
+    </div>
+
+    <div class="panel" id="panel-track">
+        <div class="section-title" id="trackTitle">Track Your Requests</div>
+        <div id="trackerContainer"></div>
+    </div>
+
+    <div class="panel" id="panel-history">
+        <div class="section-title" id="historyTitle">All My Requests</div>
+        <div id="historyList"></div>
+    </div>
+
+</div>
+
+<button type="button" class="fab" onclick="window.location.href='request.html'" title="New Request">+</button>
+
+<script>
+const API = "";
+let allMyData = [];
+
+function authHeader(){
+    const u = JSON.parse(localStorage.getItem("user"));
+    return u && u.token ? { "Authorization": "Bearer " + u.token } : {};
+}
+
+let translations = {
+    en:{
+        topTitle:"My Dashboard",
+        menuHome:"Home",
+        menuTrack:"Track Request",
+        menuHistory:"My Requests",
+        menuNew:"New Request",
+        labelTotal:"Total",
+        labelPending:"Pending",
+        labelCompleted:"Completed",
+        labelSpent:"Total Spent (TZS)",
+        activeTitle:"Active Jobs",
+        recentTitle:"Recent Requests",
+        trackTitle:"Track Your Requests",
+        historyTitle:"All My Requests",
+        noData:"No requests yet",
+        status:"Status",
+        payment:"Payment",
+        amount:"Amount",
+        driver:"Driver",
+        noDriver:"Waiting for assignment"
+    },
+    sw:{
+        topTitle:"Dashibodi Yangu",
+        menuHome:"Nyumbani",
+        menuTrack:"Fuatilia Ombi",
+        menuHistory:"Maombi Yangu",
+        menuNew:"Ombi Jipya",
+        labelTotal:"Jumla",
+        labelPending:"Yanayosubiri",
+        labelCompleted:"Yaliyokamilika",
+        labelSpent:"Jumla Iliyolipwa (TZS)",
+        activeTitle:"Kazi Zinazoendelea",
+        recentTitle:"Maombi ya Hivi Karibuni",
+        trackTitle:"Fuatilia Maombi Yako",
+        historyTitle:"Maombi Yangu Yote",
+        noData:"Hakuna maombi bado",
+        status:"Hali",
+        payment:"Malipo",
+        amount:"Kiasi",
+        driver:"Dereva",
+        noDriver:"Inasubiri ugawaji"
+    }
+};
+
+let currentLang = localStorage.getItem("lang") || "en";
+
+function applyLang(){
+    let t = translations[currentLang];
+    let ids = ["topTitle","menuHome","menuTrack","menuHistory","menuNew",
+               "labelTotal","labelPending","labelCompleted","labelSpent",
+               "activeTitle","recentTitle","trackTitle","historyTitle"];
+    ids.forEach(id => {
+        let el = document.getElementById(id);
+        if(el) el.innerText = t[id] || "";
+    });
+}
+
+function setLang(lang){
+    localStorage.setItem("lang", lang);
+    currentLang = lang;
+    applyLang();
+    renderAll();
+}
+
+applyLang();
+
+function toggleSidebar(){
+    document.getElementById("sidebar").classList.toggle("open");
+    document.getElementById("overlay").classList.toggle("show");
+}
+
+function closeSidebar(){
+    document.getElementById("sidebar").classList.remove("open");
+    document.getElementById("overlay").classList.remove("show");
+}
+
+function toggleNotif(){
+    document.getElementById("notifDropdown").classList.toggle("show");
+}
+
+document.addEventListener("click", function(e){
+    if(!e.target.closest(".notif-bell") && !e.target.closest(".notif-dropdown")){
+        document.getElementById("notifDropdown").classList.remove("show");
+    }
+});
+
+function showPanel(name){
+    document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+    document.querySelectorAll(".sidebar-item").forEach(s => s.classList.remove("active"));
+    document.getElementById("panel-" + name).classList.add("active");
+    let map = {home:0, track:1, history:2};
+    if(map[name] !== undefined){
+        document.querySelectorAll(".sidebar-item")[map[name]].classList.add("active");
+    }
+}
+
+function logout(){
+    localStorage.clear();
+    window.location.href = "login.html";
+}
+
+function timeAgo(dateStr){
+    if(!dateStr) return "";
+    let diff = Date.now() - new Date(dateStr).getTime();
+    let mins = Math.floor(diff/60000);
+    if(mins < 1) return "Just now";
+    if(mins < 60) return `${mins}m ago`;
+    let hrs = Math.floor(mins/60);
+    if(hrs < 24) return `${hrs}h ago`;
+    return `${Math.floor(hrs/24)}d ago`;
+}
+
+function getStep(req){
+    if(req.status === "completed") return 3;
+    if(req.assigned_driver) return 2;
+    return 1;
+}
+
+function renderTracker(req, index){
+    let step = getStep(req);
+    let t = translations[currentLang];
+
+    let steps = [
+        { label:"Submitted" },
+        { label:"Driver Assigned" },
+        { label:"Completed" }
+    ];
+
+    let stepsHTML = "";
+    steps.forEach((s, i) => {
+        let num = i + 1;
+        let circleClass = num < step ? "done" : num === step ? "active" : "";
+        let labelClass  = num < step ? "done" : num === step ? "active" : "";
+        let lineClass   = num < step ? "done" : "";
+
+        stepsHTML += `<div class="step">
+            <div class="step-circle ${circleClass}">${num < step ? "&#10003;" : num}</div>
+            <div class="step-label ${labelClass}">${s.label}</div>
+        </div>`;
+
+        if(i < steps.length - 1){
+            stepsHTML += `<div class="step-line ${lineClass}"></div>`;
+        }
+    });
+
+    return `
+        <div class="tracker-req">
+            <h4>#${index+1} ${req.service} —
+                <small style="color:#888;">${req.created_at ? new Date(req.created_at).toLocaleDateString() : ""}</small>
+            </h4>
+            <div class="progress-steps">${stepsHTML}</div>
+            ${req.assigned_driver ? `
+            <div class="driver-assigned">
+                ${t.driver}: ${req.assigned_driver}
+                ${req.status === "completed" ? " — Work Completed!" : " — On the way..."}
+            </div>` : `
+            <div style="margin-top:12px;padding:10px 15px;background:#fff3e0;border-radius:8px;font-size:13px;color:#e65100;">
+                ${t.noDriver}
+            </div>`}
+        </div>
+    `;
+}
+
+function renderAll(){
+    let t = translations[currentLang];
+    let data = allMyData;
+
+    let total     = data.length;
+    let pending   = data.filter(d => (d.status||"pending") !== "completed").length;
+    let completed = data.filter(d => d.status === "completed").length;
+    let spent     = data.filter(d => d.paymentStatus === "paid").reduce((s,r) => s + Number(r.amount||0), 0);
+
+    document.getElementById("total").innerText      = total;
+    document.getElementById("pending").innerText    = pending;
+    document.getElementById("completed").innerText  = completed;
+    document.getElementById("totalSpent").innerText = spent.toLocaleString();
+
+    let active = data.filter(d => (d.status||"pending") !== "completed");
+    let activeHTML = active.length === 0
+        ? `<div class="empty"><div class="e-icon"></div>No active jobs right now</div>`
+        : active.map(r => `
+            <div class="req-item pending-item">
+                <h4>${r.service}</h4>
+                <p><b>Amount:</b> Tsh ${Number(r.amount||0).toLocaleString()}</p>
+                <p><b>Driver:</b> ${r.assigned_driver || "Not yet assigned"}</p>
+                <p><b>Status:</b> ${r.assigned_driver ? "In Progress" : "Waiting"}</p>
+                <span class="tag pending">PENDING</span>
+                <span class="tag ${r.paymentStatus === 'paid' ? 'paid' : 'unpaid'}">${(r.paymentStatus||"unpaid").toUpperCase()}</span>
+            </div>
+        `).join("");
+    document.getElementById("activeJobs").innerHTML = activeHTML;
+
+    let recent = [...data].slice(0, 3);
+    let recentHTML = recent.length === 0
+        ? `<div class="empty"><div class="e-icon"></div>${t.noData}</div>`
+        : recent.map(r => {
+            let status = r.status || "pending";
+            return `
+                <div class="req-item ${status === 'completed' ? 'completed-item' : 'pending-item'}">
+                    <h4>${r.service}</h4>
+                    <p>${t.amount}: Tsh ${Number(r.amount||0).toLocaleString()}</p>
+                    <p>${t.driver}: ${r.assigned_driver || t.noDriver}</p>
+                    <span class="tag ${status}">${status.toUpperCase()}</span>
+                    <span class="tag ${r.paymentStatus === 'paid' ? 'paid' : 'unpaid'}">${(r.paymentStatus||"unpaid").toUpperCase()}</span>
+                </div>
+            `;
+        }).join("");
+    document.getElementById("recentList").innerHTML = recentHTML;
+
+    let trackerHTML = data.length === 0
+        ? `<div class="empty"><div class="e-icon"></div>${t.noData}</div>`
+        : `<div class="tracker">${data.map((r,i) => renderTracker(r,i)).join("")}</div>`;
+    document.getElementById("trackerContainer").innerHTML = trackerHTML;
+
+    let historyHTML = data.length === 0
+        ? `<div class="empty"><div class="e-icon"></div>${t.noData}</div>`
+        : data.map(r => {
+            let status = r.status || "pending";
+            let isPaid = r.paymentStatus === "paid";
+            return `
+                <div class="req-item ${status === 'completed' ? 'completed-item' : 'pending-item'}">
+                    <h4>${r.service} — #${r.id}</h4>
+                    <p><b>Name:</b> ${r.name}</p>
+                    <p><b>Phone:</b> ${r.phone}</p>
+                    <p><b>Amount:</b> Tsh ${Number(r.amount||0).toLocaleString()}</p>
+                    <p><b>${t.driver}:</b> ${r.assigned_driver || t.noDriver}</p>
+                    <p><b>Date:</b> ${r.created_at ? new Date(r.created_at).toLocaleDateString('en-GB') : "-"}</p>
+                    <span class="tag ${status}">${status.toUpperCase()}</span>
+                    <span class="tag ${isPaid ? 'paid' : 'unpaid'}">${isPaid ? 'PAID' : 'UNPAID'}</span>
+                </div>
+            `;
+        }).join("");
+    document.getElementById("historyList").innerHTML = historyHTML;
+
+    renderNotifications(data);
+}
+
+function renderNotifications(data){
+    let notifs = [];
+
+    data.forEach(req => {
+        if(req.status === "completed"){
+            notifs.push({
+                type:"completed",
+                title:`Work Completed — ${req.service}`,
+                body:`Driver ${req.assigned_driver || "-"} completed your request.`
+            });
+        }
+        if(req.paymentStatus === "paid"){
+            notifs.push({
+                type:"payment",
+                title:`Payment Confirmed — Tsh ${Number(req.amount||0).toLocaleString()}`,
+                body:`Your payment for ${req.service} has been received.`
+            });
+        }
+        if(req.assigned_driver && req.status !== "completed"){
+            notifs.push({
+                type:"assigned",
+                title:`Driver Assigned — ${req.service}`,
+                body:`Driver ${req.assigned_driver} has been assigned to your request.`
+            });
+        }
+    });
+
+    let dot  = document.getElementById("notifDot");
+    let list = document.getElementById("notifList");
+
+    if(notifs.length === 0){
+        dot.style.display = "none";
+        list.innerHTML = `<div class="notif-empty">No notifications yet</div>`;
+        return;
+    }
+
+    dot.style.display = "flex";
+    dot.innerText = notifs.length > 9 ? "9+" : notifs.length;
+
+    list.innerHTML = notifs.map(n => `
+        <div class="notif-item ${n.type}">
+            <div class="notif-body">
+                <h4>${n.title}</h4>
+                <p>${n.body}</p>
+            </div>
+        </div>
+    `).join("");
+}
+
+document.getElementById("sidebarUsername").innerText = userData.username;
+document.getElementById("avatarLetter").innerText    = userData.username.charAt(0).toUpperCase();
+
+async function loadData(){
+    try{
+        let res  = await fetch(`${API}/api/requests`, { headers: authHeader() });
+        let all  = await res.json();
+        allMyData = all;
+        renderAll();
+    }catch(err){
+        console.log("Load error:", err);
+    }
+}
+
+loadData();
+setInterval(loadData, 30000);
+</script>
+
+</body>
+</html>
