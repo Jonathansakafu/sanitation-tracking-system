@@ -18,11 +18,15 @@ body{
 .navbar{
     background:linear-gradient(135deg,#1b5e20,#2e7d32);
     color:white;
-    padding:15px 30px;
+    padding:12px 20px;
     display:flex;
     justify-content:space-between;
     align-items:center;
     box-shadow:0 2px 10px rgba(0,0,0,0.2);
+    position:sticky;
+    top:0;
+    z-index:500;
+    gap:10px;
 }
 
 .navbar-left{ display:flex; align-items:center; gap:15px; }
@@ -33,18 +37,29 @@ body{
     cursor:pointer; padding:5px; line-height:1;
 }
 
-.navbar-right{ display:flex; gap:10px; align-items:center; }
+.navbar-right{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    overflow-x:auto;
+    max-width:100%;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+}
+.navbar-right::-webkit-scrollbar{ display:none; }
 
 .link-btn{
     background:rgba(255,255,255,0.15);
     color:white;
     border:1px solid rgba(255,255,255,0.4);
-    padding:8px 14px;
+    padding:8px 12px;
     border-radius:6px;
     cursor:pointer;
     font-weight:bold;
     text-decoration:none;
     font-size:13px;
+    white-space:nowrap;
+    flex-shrink:0;
 }
 .link-btn:hover{ background:rgba(255,255,255,0.3); }
 
@@ -56,6 +71,7 @@ body{
     color:white;
     cursor:pointer;
     font-size:11px;
+    flex-shrink:0;
 }
 .lang-btn-sm:hover{ background:rgba(255,255,255,0.25); }
 
@@ -67,6 +83,8 @@ body{
     border-radius:6px;
     cursor:pointer;
     font-weight:bold;
+    white-space:nowrap;
+    flex-shrink:0;
 }
 
 .greeting-banner{
@@ -128,6 +146,20 @@ body{
     margin-bottom:15px; padding-bottom:8px; border-bottom:2px solid #e8f5e9;
 }
 .section-sub{ font-size:12px; color:#888; margin:-10px 0 15px; }
+
+.back-btn{
+    display:inline-block;
+    margin-bottom:15px;
+    padding:9px 16px;
+    background:#e8f5e9;
+    color:#1b5e20;
+    border:1px solid #c8e6c9;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+    font-size:13px;
+}
+.back-btn:hover{ background:#c8e6c9; }
 
 .stat-cards{
     display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
@@ -256,11 +288,12 @@ body{
     }
     .sidebar.collapsed{ transform:translateX(0); width:220px; padding:20px 0; }
     .overlay.show{ display:block; }
-    .navbar-right .link-btn span.link-text{ display:none; }
+    #heatmap{ height:360px; }
 }
 
 @media (max-width:480px){
     .driver-list{ grid-template-columns:1fr; }
+    #heatmap{ height:300px; }
 }
 
 /* ---- Toast Notifications ---- */
@@ -394,6 +427,7 @@ if(!user || user.role !== "admin"){
         </div>
 
         <div class="panel" id="panel-heatmap">
+            <button type="button" class="back-btn" onclick="showPanel('overview')">&larr; Back to Overview</button>
             <div class="section-title">Resident Service Request Heatmap</div>
             <div class="map-legend">
                 <div class="legend-item">
