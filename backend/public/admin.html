@@ -1140,7 +1140,7 @@ function makeCard(req, showAssign){
             <span class="tag ${payClass}">${(req.paymentStatus||"unpaid").toUpperCase()}</span>
 
             ${showAssign && status !== "completed" ? `
-            <select class="assign-select" onchange="assignDriver(${req.id}, this.value)">
+            <select class="assign-select" aria-label="Assign driver" onchange="assignDriver(${req.id}, this.value)">
                 ${getDriverOptions()}
             </select>` : ""}
 

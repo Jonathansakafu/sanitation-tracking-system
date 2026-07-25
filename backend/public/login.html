@@ -105,6 +105,16 @@ footer{
     background:#1b5e20;
 }
 
+.sr-only{
+    position:absolute;
+    width:1px; height:1px;
+    padding:0; margin:-1px;
+    overflow:hidden;
+    clip:rect(0,0,0,0);
+    white-space:nowrap;
+    border:0;
+}
+
 /* ---- Auto-generated from inline styles ---- */
 .gen-1{
     color:white;
@@ -134,9 +144,9 @@ if(existingUser){
     <h2 id="navTitle"></h2>
     <div class="nav-right">
         <a href="#about" id="aboutLink" class="gen-1" title="About">About</a>
-        <a href="guide.html" class="gen-1">Help</a>
-        <button type="button" onclick="setLang('en')">EN</button>
-        <button type="button" onclick="setLang('sw')">SW</button>
+        <a href="guide.html" class="gen-1" title="Help">Help</a>
+        <button type="button" title="Switch to English" onclick="setLang('en')">EN</button>
+        <button type="button" title="Badilisha kwa Kiswahili" onclick="setLang('sw')">SW</button>
     </div>
 </div>
 
@@ -150,7 +160,9 @@ if(existingUser){
     <div class="box">
         <h2 id="loginTitle"></h2>
         <form id="loginForm">
+            <label for="username" class="sr-only">Username</label>
             <input type="text" id="username" placeholder="Username" required>
+            <label for="password" class="sr-only">Password</label>
             <input type="password" id="password" placeholder="Password" required>
             <button type="submit" class="main-btn" id="loginBtn">Login</button>
         </form>

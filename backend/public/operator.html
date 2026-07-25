@@ -662,19 +662,19 @@ if(!user || user.role !== "operator"){
         </div>
         <div class="list-toolbar">
             <input type="text" id="jobsSearchInput" placeholder="Search by resident, request ID, or service..." oninput="onJobsControlsChanged()">
-            <select id="jobsStatusFilter" onchange="onJobsControlsChanged()">
+            <select id="jobsStatusFilter" aria-label="Filter by status" onchange="onJobsControlsChanged()">
                 <option value="all">All Statuses</option>
                 <option value="pending">Pending</option>
                 <option value="driver_assigned">Driver Assigned</option>
                 <option value="completed">Completed</option>
             </select>
-            <select id="jobsPaymentFilter" onchange="onJobsControlsChanged()">
+            <select id="jobsPaymentFilter" aria-label="Filter by payment status" onchange="onJobsControlsChanged()">
                 <option value="all">All Payments</option>
                 <option value="paid">Paid</option>
                 <option value="unpaid">Unpaid</option>
                 <option value="pending_confirmation">Awaiting Approval</option>
             </select>
-            <select id="jobsSortBy" onchange="onJobsControlsChanged()">
+            <select id="jobsSortBy" aria-label="Sort jobs" onchange="onJobsControlsChanged()">
                 <option value="newest">Newest First</option>
                 <option value="oldest">Oldest First</option>
             </select>
@@ -703,7 +703,7 @@ if(!user || user.role !== "operator"){
         <div class="section-title">My Drivers</div>
         <div class="list-toolbar">
             <input type="text" id="driversSearchInput" placeholder="Search by name, username, or phone..." oninput="onDriversControlsChanged()">
-            <select id="driversSortBy" onchange="onDriversControlsChanged()">
+            <select id="driversSortBy" aria-label="Sort drivers" onchange="onDriversControlsChanged()">
                 <option value="name-asc">Name A-Z</option>
                 <option value="name-desc">Name Z-A</option>
             </select>
@@ -1042,8 +1042,8 @@ function jobCardHTML(j){
             <div class="gen-9">
                 <p class="gen-10"><b>Claim this job to assign a driver:</b></p>
                 <div class="assign-row">
-                    <select id="driverSel-${j.id}">${driverOptionsHTML()}</select>
-                    <select id="truckSel-${j.id}">${truckOptionsHTML(j.id, j.truck_id)}</select>
+                    <select id="driverSel-${j.id}" aria-label="Select driver">${driverOptionsHTML()}</select>
+                    <select id="truckSel-${j.id}" aria-label="Select truck">${truckOptionsHTML(j.id, j.truck_id)}</select>
                 </div>
                 <button type="button" class="btn-assign gen-11" id="assignBtn-${j.id}" onclick="assignDriver(${j.id})">Claim &amp; Assign Driver</button>
             </div>
@@ -1052,8 +1052,8 @@ function jobCardHTML(j){
         actionHTML = `
             <div class="gen-12">
                 <div class="assign-row">
-                    <select id="driverSel-${j.id}">${driverOptionsHTML(j.driver_id)}</select>
-                    <select id="truckSel-${j.id}">${truckOptionsHTML(j.id, j.truck_id)}</select>
+                    <select id="driverSel-${j.id}" aria-label="Select driver">${driverOptionsHTML(j.driver_id)}</select>
+                    <select id="truckSel-${j.id}" aria-label="Select truck">${truckOptionsHTML(j.id, j.truck_id)}</select>
                 </div>
                 <button type="button" class="btn-assign gen-11" id="assignBtn-${j.id}" onclick="assignDriver(${j.id})">Re-Assign Driver</button>
             </div>

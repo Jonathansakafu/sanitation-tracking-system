@@ -46,6 +46,16 @@ body{
     backdrop-filter:blur(10px);
 }
 
+.sr-only{
+    position:absolute;
+    width:1px; height:1px;
+    padding:0; margin:-1px;
+    overflow:hidden;
+    clip:rect(0,0,0,0);
+    white-space:nowrap;
+    border:0;
+}
+
 @media (max-width:400px){
     .box{ padding:22px; }
 }
@@ -114,10 +124,15 @@ a{ color:white; font-size:13px; }
         For residents (Mteja) only. Operators are registered by EWURA and drivers by their operator.
     </p>
     <form id="form">
+        <label for="fullname" class="sr-only" id="labelFullname">Full Name</label>
         <input type="text" id="fullname" placeholder="Full Name" required>
+        <label for="phone" class="sr-only" id="labelPhone">Phone Number</label>
         <input type="text" id="phone" placeholder="Phone Number" required>
+        <label for="ward" class="sr-only" id="labelWard">Ward</label>
         <input type="text" id="ward" placeholder="Ward (e.g. Kinondoni)" required>
+        <label for="username" class="sr-only" id="labelUsername">Username</label>
         <input type="text" id="username" placeholder="Username" required>
+        <label for="password" class="sr-only" id="labelPassword">Password</label>
         <input type="password" id="password" placeholder="Password" required>
         <button type="submit" id="submitBtn">Create Account</button>
     </form>
@@ -165,10 +180,15 @@ function applyLang(){
     document.getElementById("pageTitle").innerText = t.pageTitle;
     document.getElementById("pageIntro").innerText = t.pageIntro;
     document.getElementById("fullname").placeholder = t.fullname;
+    document.getElementById("labelFullname").innerText = t.fullname;
     document.getElementById("phone").placeholder = t.phone;
+    document.getElementById("labelPhone").innerText = t.phone;
     document.getElementById("ward").placeholder = t.ward;
+    document.getElementById("labelWard").innerText = t.ward;
     document.getElementById("username").placeholder = t.username;
+    document.getElementById("labelUsername").innerText = t.username;
     document.getElementById("password").placeholder = t.password;
+    document.getElementById("labelPassword").innerText = t.password;
     document.getElementById("submitBtn").innerText = t.submitBtn;
     document.getElementById("haveAccount").innerText = t.haveAccount;
     document.getElementById("loginLink").innerText = t.loginLink;

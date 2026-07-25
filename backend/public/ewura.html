@@ -422,7 +422,7 @@ if(!user || user.role !== "admin"){
 
             <div class="list-toolbar" id="opsToolbar">
                 <input type="text" id="opsSearchInput" placeholder="Search by business name or username..." oninput="onOpsControlsChanged()">
-                <select id="opsSortBy" onchange="onOpsControlsChanged()">
+                <select id="opsSortBy" aria-label="Sort operators" onchange="onOpsControlsChanged()">
                     <option value="newest">Newest First</option>
                     <option value="oldest">Oldest First</option>
                     <option value="name-asc">Name A-Z</option>
