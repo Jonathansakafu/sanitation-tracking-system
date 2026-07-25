@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<title>System Admin (Legacy Tools)</title>
 
 <style>
 *{ box-sizing:border-box; margin:0; padding:0; }
@@ -52,6 +51,49 @@ body{
     cursor:pointer;
     font-weight:bold;
 }
+
+.privacy-btn{
+    background:rgba(255,255,255,0.15);
+    border:1px solid rgba(255,255,255,0.4);
+    color:white;
+    width:34px; height:34px;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:15px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+.privacy-btn:hover{ background:rgba(255,255,255,0.3); }
+
+.lang-btn-sm{
+    padding:5px 9px;
+    border:1px solid rgba(255,255,255,0.4);
+    border-radius:5px;
+    background:rgba(255,255,255,0.1);
+    color:white;
+    cursor:pointer;
+    font-size:11px;
+}
+.lang-btn-sm:hover{ background:rgba(255,255,255,0.25); }
+
+body.privacy-on .money-value{
+    filter:blur(6px);
+    -webkit-user-select:none;
+    user-select:none;
+    transition:filter 0.2s;
+}
+
+.greeting-banner{
+    background:linear-gradient(135deg,#2e7d32,#66bb6a);
+    color:white;
+    padding:20px 25px;
+    border-radius:14px;
+    margin-bottom:20px;
+    box-shadow:0 4px 15px rgba(46,125,50,0.25);
+}
+.greeting-banner h2{ margin:0; font-size:20px; }
+.greeting-banner p{ margin-top:6px; font-size:13px; opacity:0.9; }
 
 .layout{
     display:flex;
@@ -184,7 +226,9 @@ body{
     padding:20px;
     box-shadow:0 2px 8px rgba(0,0,0,0.06);
     border-left:5px solid #ccc;
+    transition:box-shadow 0.2s ease, transform 0.2s ease;
 }
+.req-card:hover{ box-shadow:0 6px 18px rgba(0,0,0,0.1); transform:translateY(-2px); }
 
 .req-card.pending{ border-left-color:orange; }
 .req-card.completed{ border-left-color:#2e7d32; }
@@ -415,7 +459,9 @@ body{
     border-radius:12px;
     box-shadow:0 2px 8px rgba(0,0,0,0.06);
     border-top:4px solid #2e7d32;
+    transition:box-shadow 0.2s ease, transform 0.2s ease;
 }
+.driver-card:hover{ box-shadow:0 6px 18px rgba(0,0,0,0.1); transform:translateY(-2px); }
 
 .driver-card h4{ margin:0 0 8px; color:#1b5e20; }
 .driver-card p{ font-size:13px; color:#666; margin:3px 0; }
@@ -503,6 +549,69 @@ body{
 @media (max-width:480px){
     .req-grid, .driver-list{ grid-template-columns:1fr; }
 }
+
+/* ---- Operators panel: tabs + search/sort toolbar + pagination ---- */
+.sub-tabs{ display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap; }
+.tab-btn{
+    padding:8px 16px; background:#fff; border:1px solid #ccc; border-radius:6px;
+    cursor:pointer; font-size:13px; font-weight:600;
+}
+.tab-btn.active{ background:#e8f5e9; border-color:#2e7d32; color:#2e7d32; }
+
+.list-toolbar{ display:flex; gap:10px; flex-wrap:wrap; margin:0 0 18px; }
+.list-toolbar input[type="text"]{
+    flex:2; min-width:200px; padding:10px 12px; border:1px solid #d7dbe0; border-radius:10px; font-size:13px;
+}
+.list-toolbar select{
+    flex:1; min-width:130px; padding:10px 12px; border:1px solid #d7dbe0; border-radius:10px; font-size:13px; background:white;
+}
+.list-toolbar input:focus, .list-toolbar select:focus{ outline:none; border-color:#2e7d32; }
+
+.pagination{ display:flex; align-items:center; justify-content:center; gap:14px; margin-top:18px; }
+.pagination button{
+    padding:8px 16px; border:1px solid #d7dbe0; background:white; border-radius:8px;
+    cursor:pointer; font-size:13px; font-weight:600; color:#2e7d32;
+}
+.pagination button:disabled{ color:#bbb; cursor:not-allowed; border-color:#eee; }
+.pagination button:hover:not(:disabled){ background:#e8f5e9; }
+.pagination .page-info{ font-size:13px; color:#666; }
+
+/* ---- Toast Notifications ---- */
+#toastContainer{
+    position:fixed; top:75px; right:15px; z-index:99999;
+    display:flex; flex-direction:column; gap:10px; pointer-events:none;
+    max-width:calc(100vw - 30px);
+}
+.toast{
+    min-width:240px; max-width:360px; padding:16px 20px; border-radius:10px;
+    color:#fff; font-size:14px; font-weight:700; box-shadow:0 10px 28px rgba(0,0,0,0.3);
+    border-left:5px solid rgba(255,255,255,0.55); opacity:0; transform:translateX(50px);
+    animation:toastIn 0.3s ease forwards, toastOut 0.3s ease forwards 3.2s; pointer-events:auto;
+}
+.toast.success{ background:#2e7d32; }
+.toast.error{ background:#c62828; }
+.toast.info{ background:#00695c; }
+@keyframes toastIn{ to{ opacity:1; transform:translateX(0); } }
+@keyframes toastOut{ to{ opacity:0; transform:translateX(50px); } }
+
+/* ---- Confirm Dialog ---- */
+#confirmOverlay{
+    position:fixed; inset:0; background:rgba(0,0,0,0.78); display:flex;
+    align-items:center; justify-content:center; z-index:100000; padding:20px;
+    animation:confirmFadeIn 0.15s ease forwards;
+}
+@keyframes confirmFadeIn{ from{ opacity:0; } to{ opacity:1; } }
+.confirm-box{
+    background:#fff; padding:0 0 26px; border-radius:16px; max-width:360px; width:100%;
+    text-align:center; box-shadow:0 25px 60px rgba(0,0,0,0.5); border-top:8px solid #2e7d32;
+    animation:confirmPopIn 0.18s ease forwards;
+}
+@keyframes confirmPopIn{ from{ transform:scale(0.9); opacity:0; } to{ transform:scale(1); opacity:1; } }
+.confirm-box p{ margin:24px 20px 22px; color:#1b1b1b; font-size:16px; font-weight:700; line-height:1.5; }
+.confirm-actions{ display:flex; gap:10px; justify-content:center; }
+.confirm-btn{ padding:12px 26px; border-radius:9px; border:none; cursor:pointer; font-weight:bold; font-size:15px; }
+.confirm-btn.yes{ background:#2e7d32; color:#fff; }
+.confirm-btn.no{ background:#eee; color:#333; }
 </style>
 </head>
 
@@ -518,9 +627,15 @@ if(!user || user.role !== "admin"){
 <div class="navbar">
     <div class="navbar-left">
         <button type="button" class="menu-btn" onclick="toggleSidebar()">&#9776;</button>
-        <h2>Sanitation Admin Panel</h2>
+        <h2 id="pageTitle">System Admin — Legacy Tools</h2>
     </div>
-    <button type="button" class="logout-btn" onclick="logout()">Logout</button>
+    <div style="display:flex;gap:10px;align-items:center;">
+        <a href="ewura.html" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.4);padding:8px 14px;border-radius:6px;text-decoration:none;font-weight:bold;font-size:13px;">EWURA Dashboard</a>
+        <button type="button" class="lang-btn-sm" onclick="setLang('en')">EN</button>
+        <button type="button" class="lang-btn-sm" onclick="setLang('sw')">SW</button>
+        <button type="button" class="privacy-btn" id="privacyBtn" onclick="togglePrivacy()" title="Hide/show revenue">&#128065;</button>
+        <button type="button" class="logout-btn" onclick="logout()">Logout</button>
+    </div>
 </div>
 
 <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
@@ -529,32 +644,39 @@ if(!user || user.role !== "admin"){
 
     <div class="sidebar" id="sidebar">
         <div class="sidebar-item active" onclick="showPanel('overview')">
-            <span>Overview</span>
+            <span id="menuOverview">Overview</span>
         </div>
         <div class="sidebar-item" onclick="showPanel('pending')">
-            <span>Pending</span>
+            <span id="menuPending">Pending</span>
             <span class="badge orange" id="pendingBadge">0</span>
         </div>
         <div class="sidebar-item" onclick="showPanel('completed')">
-            <span>Completed</span>
+            <span id="menuCompleted">Completed</span>
             <span class="badge" id="completedBadge">0</span>
         </div>
         <div class="sidebar-item" onclick="showPanel('all')">
-            <span>All Requests</span>
+            <span id="menuAll">All Requests</span>
             <span class="badge" id="allBadge">0</span>
         </div>
         <div class="sidebar-item" onclick="showPanel('drivers')">
-            <span>Drivers</span>
+            <span id="menuDrivers">Drivers</span>
             <span class="badge blue" id="driversBadge">0</span>
         </div>
         <div class="sidebar-item" onclick="showPanel('stats')">
-            <span>Revenue & Stats</span>
+            <span id="menuStats">Revenue & Stats</span>
+        </div>
+        <div class="sidebar-item" onclick="window.location.href='guide.html'">
+            <span id="menuHelp">Help / User Guide</span>
         </div>
     </div>
 
     <div class="main">
 
         <div class="panel active" id="panel-overview">
+            <div class="greeting-banner">
+                <h2 id="greetingText">Habari!</h2>
+                <p id="liveDateTime"></p>
+            </div>
             <div class="stat-cards">
                 <div class="stat-card blue" onclick="showPanel('all')">
                     <h4>Total Requests</h4>
@@ -573,7 +695,7 @@ if(!user || user.role !== "admin"){
                 </div>
                 <div class="stat-card purple" onclick="showPanel('stats')">
                     <h4>Total Revenue</h4>
-                    <div class="num" id="revenueNum">0</div>
+                    <div class="num money-value" id="revenueNum">0</div>
                     <div class="sub">TZS collected</div>
                 </div>
                 <div class="stat-card teal" onclick="showPanel('drivers')">
@@ -582,29 +704,7 @@ if(!user || user.role !== "admin"){
                     <div class="sub">Active drivers</div>
                 </div>
             </div>
-
-            <div class="section-title">Request Heatmap</div>
-            <div class="map-legend">
-                <div class="legend-item">
-                    <div class="legend-color" style="background:linear-gradient(to right,yellow,orange,red);"></div>
-                    <span>Low to Medium to High demand areas</span>
-                </div>
-                <div class="legend-item">
-                    <svg width="18" height="26" viewBox="0 0 24 36">
-                        <path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 24 12 24s12-15 12-24C24 5.4 18.6 0 12 0z" fill="orange" stroke="white" stroke-width="1.2"/>
-                        <circle cx="12" cy="12" r="5" fill="white" opacity="0.9"/>
-                    </svg>
-                    <span>Pending</span>
-                </div>
-                <div class="legend-item">
-                    <svg width="18" height="26" viewBox="0 0 24 36">
-                        <path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 24 12 24s12-15 12-24C24 5.4 18.6 0 12 0z" fill="#2e7d32" stroke="white" stroke-width="1.2"/>
-                        <circle cx="12" cy="12" r="5" fill="white" opacity="0.9"/>
-                    </svg>
-                    <span>Completed</span>
-                </div>
-            </div>
-            <div id="heatmap"></div>
+            <p style="color:#888;font-size:13px;">For the demand heatmap and operator oversight, see the <a href="ewura.html" style="color:#2e7d32;font-weight:bold;">EWURA Dashboard</a>.</p>
         </div>
 
         <div class="panel" id="panel-pending">
@@ -643,17 +743,17 @@ if(!user || user.role !== "admin"){
             <div class="stat-cards">
                 <div class="stat-card purple">
                     <h4>Total Revenue</h4>
-                    <div class="num" id="statsTotalRevenue">0</div>
+                    <div class="num money-value" id="statsTotalRevenue">0</div>
                     <div class="sub">TZS all time</div>
                 </div>
                 <div class="stat-card green">
                     <h4>Completed Revenue</h4>
-                    <div class="num" id="statsCompletedRevenue">0</div>
+                    <div class="num money-value" id="statsCompletedRevenue">0</div>
                     <div class="sub">TZS from completed</div>
                 </div>
                 <div class="stat-card orange">
                     <h4>Pending Revenue</h4>
-                    <div class="num" id="statsPendingRevenue">0</div>
+                    <div class="num money-value" id="statsPendingRevenue">0</div>
                     <div class="sub">TZS expected</div>
                 </div>
                 <div class="stat-card blue">
@@ -690,9 +790,6 @@ if(!user || user.role !== "admin"){
     </div>
 </div>
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
-
 <script>
 const API = "";
 
@@ -701,13 +798,132 @@ function authHeader(){
     return u && u.token ? { "Authorization": "Bearer " + u.token } : {};
 }
 
+let displayName = (JSON.parse(localStorage.getItem("user")) || {}).username || "Admin";
+
+// ---- Time-of-day greeting + live clock (respects the site-wide EN/SW preference) ----
+function greetingWord(){
+    let hour = new Date().getHours();
+    let lang = localStorage.getItem("lang") || "en";
+    let phrases = lang === "sw"
+        ? { morning:"Habari za asubuhi", afternoon:"Habari za mchana", evening:"Habari za jioni", night:"Habari za usiku" }
+        : { morning:"Good morning", afternoon:"Good afternoon", evening:"Good evening", night:"Good night" };
+    if(hour < 12) return phrases.morning;
+    if(hour < 18) return phrases.afternoon;
+    if(hour < 22) return phrases.evening;
+    return phrases.night;
+}
+
+function updateClock(){
+    let now = new Date();
+    let lang = localStorage.getItem("lang") || "en";
+    let el = document.getElementById("greetingText");
+    if(el) el.innerText = `${greetingWord()}, ${displayName}!`;
+    let dtEl = document.getElementById("liveDateTime");
+    if(dtEl){
+        dtEl.innerText = now.toLocaleDateString(
+            lang === "sw" ? "sw-TZ" : "en-GB",
+            { weekday:"long", day:"2-digit", month:"long", year:"numeric" }
+        ) + " — " + now.toLocaleTimeString(lang === "sw" ? "sw-TZ" : "en-GB", { hour:"2-digit", minute:"2-digit", second:"2-digit" });
+    }
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// ---- Privacy toggle: blur every amount marked .money-value ----
+function updatePrivacyIcon(){
+    let on = document.body.classList.contains("privacy-on");
+    let btn = document.getElementById("privacyBtn");
+    if(btn) btn.innerHTML = on ? "&#128584;" : "&#128065;";
+}
+function togglePrivacy(){
+    document.body.classList.toggle("privacy-on");
+    localStorage.setItem("privacyMode", document.body.classList.contains("privacy-on") ? "on" : "off");
+    updatePrivacyIcon();
+}
+if(localStorage.getItem("privacyMode") === "on") document.body.classList.add("privacy-on");
+updatePrivacyIcon();
+
+// ---- Language toggle ----
+const pageTranslations = {
+    en:{
+        pageTitle:"System Admin — Legacy Tools",
+        menuOverview:"Overview", menuPending:"Pending", menuCompleted:"Completed",
+        menuAll:"All Requests", menuDrivers:"Drivers", menuStats:"Revenue & Stats", menuHelp:"Help / User Guide"
+    },
+    sw:{
+        pageTitle:"Msimamizi wa Mfumo — Zana za Zamani",
+        menuOverview:"Muhtasari", menuPending:"Yanayosubiri", menuCompleted:"Yaliyokamilika",
+        menuAll:"Maombi Yote", menuDrivers:"Madereva", menuStats:"Mapato na Takwimu", menuHelp:"Msaada / Mwongozo"
+    }
+};
+
+function applyPageLang(){
+    let lang = localStorage.getItem("lang") || "en";
+    let t = pageTranslations[lang];
+    Object.keys(t).forEach(id => {
+        let el = document.getElementById(id);
+        if(el) el.innerText = t[id];
+    });
+}
+
+function setLang(lang){
+    localStorage.setItem("lang", lang);
+    applyPageLang();
+    if(typeof updateClock === "function") updateClock();
+}
+applyPageLang();
+
+// ---- Toast Notifications ----
+function showToast(message, type){
+    type = type || "info";
+    let container = document.getElementById("toastContainer");
+    if(!container){
+        container = document.createElement("div");
+        container.id = "toastContainer";
+        document.body.appendChild(container);
+    }
+    const toast = document.createElement("div");
+    toast.className = "toast " + type;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3600);
+}
+
+// ---- Promise-based confirm dialog (replaces native confirm()) ----
+function showConfirm(message){
+    return new Promise((resolve) => {
+        const overlay = document.createElement("div");
+        overlay.id = "confirmOverlay";
+        overlay.innerHTML = `
+            <div class="confirm-box">
+                <p></p>
+                <div class="confirm-actions">
+                    <button class="confirm-btn no">Cancel</button>
+                    <button class="confirm-btn yes">Yes</button>
+                </div>
+            </div>`;
+        overlay.querySelector(".confirm-box p").textContent = message;
+        document.body.appendChild(overlay);
+        overlay.querySelector(".yes").onclick = () => { overlay.remove(); resolve(true); };
+        overlay.querySelector(".no").onclick = () => { overlay.remove(); resolve(false); };
+    });
+}
+
+// Reusable pagination control renderer, shared by every paginated list on this page.
+function renderPaginationControls(containerId, currentPage, totalItems, pageSize, onPageChangeFnName){
+    let container = document.getElementById(containerId);
+    if(!container) return;
+    let totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+    if(totalItems === 0){ container.innerHTML = ""; return; }
+    container.innerHTML = `
+        <button ${currentPage <= 1 ? "disabled" : ""} onclick="${onPageChangeFnName}(${currentPage - 1})">Prev</button>
+        <span class="page-info">Page ${currentPage} of ${totalPages} (${totalItems} total)</span>
+        <button ${currentPage >= totalPages ? "disabled" : ""} onclick="${onPageChangeFnName}(${currentPage + 1})">Next</button>
+    `;
+}
+
 let allRequests = [];
 let allDrivers = [];
-let heatmapInitialized = false;
-let leafletMap = null;
-let heatLayer = null;
-let mapMarkers = [];
-
 function logout(){
     localStorage.clear();
     window.location.href = "login.html";
@@ -732,7 +948,6 @@ function showPanel(name){
         document.querySelectorAll(".sidebar-item")[map[name]].classList.add("active");
     }
     closeSidebar();
-    if(name === "overview") initHeatmap();
 }
 
 function openModal(req){
@@ -758,7 +973,7 @@ function openModal(req){
             <span class="info-value">${req.assigned_driver || "-"}</span>
         </div>
         <div class="info-row">
-            <span class="info-label">Customer</span>
+            <span class="info-label">Resident</span>
             <span class="info-value">${req.name || "-"}</span>
         </div>
         <div class="info-row">
@@ -783,7 +998,7 @@ function openModal(req){
         </div>
         <div class="info-row">
             <span class="info-label">Amount</span>
-            <span class="info-value">Tsh ${Number(req.amount||0).toLocaleString()}</span>
+            <span class="info-value money-value">Tsh ${Number(req.amount||0).toLocaleString()}</span>
         </div>
     `;
 
@@ -802,6 +1017,7 @@ async function loadAll(){
     await loadDrivers();
     await loadRequests();
 }
+
 
 async function loadDrivers(){
     try{
@@ -867,7 +1083,6 @@ async function loadRequests(){
         renderAll();
         renderDriverList();
         renderStats();
-        updateHeatmap();
 
     }catch(err){ console.log(err); }
 }
@@ -880,9 +1095,9 @@ function makeCard(req, showAssign){
     return `
         <div class="req-card ${statusClass}">
             <h4>${req.service||"-"} — #${req.id}</h4>
-            <p><b>Customer:</b> ${req.name||"-"}</p>
+            <p><b>Resident:</b> ${req.name||"-"}</p>
             <p><b>Phone:</b> ${req.phone||"-"}</p>
-            <p><b>Amount:</b> Tsh ${Number(req.amount||0).toLocaleString()}</p>
+            <p><b>Amount:</b> <span class="money-value">Tsh ${Number(req.amount||0).toLocaleString()}</span></p>
             <p><b>Driver:</b> ${req.assigned_driver||"Not assigned"}</p>
             <p><b>Date:</b> ${req.created_at ? new Date(req.created_at).toLocaleDateString('en-GB') : "-"}</p>
             <span class="tag ${statusClass}">${status.toUpperCase()}</span>
@@ -953,7 +1168,7 @@ function renderStats(){
             <div class="bar-track">
                 <div class="bar-fill" style="width:${(rev/maxDRev)*100}%"></div>
             </div>
-            <div class="bar-value">Tsh ${rev.toLocaleString()}</div>
+            <div class="bar-value money-value">Tsh ${rev.toLocaleString()}</div>
         </div>
     `).join("");
 
@@ -974,84 +1189,11 @@ function renderStats(){
             <div class="bar-track">
                 <div class="bar-fill" style="width:${(rev/maxSRev)*100}%;background:linear-gradient(to right,#1565c0,#42a5f5);"></div>
             </div>
-            <div class="bar-value">Tsh ${rev.toLocaleString()}</div>
+            <div class="bar-value money-value">Tsh ${rev.toLocaleString()}</div>
         </div>
     `).join("");
 
     document.getElementById("serviceRevenue").innerHTML = serviceHTML;
-}
-
-function initHeatmap(){
-    if(heatmapInitialized) return;
-    heatmapInitialized = true;
-
-    leafletMap = L.map('heatmap').setView([-6.8, 39.28], 12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-        attribution:'&copy; OpenStreetMap contributors'
-    }).addTo(leafletMap);
-
-    updateHeatmap();
-}
-
-function updateHeatmap(){
-    if(!leafletMap) return;
-
-    let points = [];
-
-    mapMarkers.forEach(m => leafletMap.removeLayer(m));
-    mapMarkers = [];
-
-    if(heatLayer) leafletMap.removeLayer(heatLayer);
-
-    allRequests.forEach(r => {
-        let lat = parseFloat(r.lat);
-        let lng = parseFloat(r.lng);
-
-        if(!isNaN(lat) && lat !== 0 && !isNaN(lng) && lng !== 0){
-            points.push([lat, lng, 1]);
-
-            let color = r.status === "completed" ? "#2e7d32" : "orange";
-
-            let icon = L.divIcon({
-                className:"",
-                html:`<div style="position:relative;width:30px;height:42px;cursor:pointer;">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="30" height="42">
-                        <path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 24 12 24s12-15 12-24C24 5.4 18.6 0 12 0z"
-                            fill="${color}" stroke="white" stroke-width="1.2"/>
-                        <circle cx="12" cy="12" r="5" fill="white" opacity="0.9"/>
-                    </svg>
-                </div>`,
-                iconSize:[30,42],
-                iconAnchor:[15,42]
-            });
-
-            let marker = L.marker([lat, lng], {icon})
-                .addTo(leafletMap)
-                .bindPopup(`
-                    <div style="min-width:180px;font-family:Segoe UI,sans-serif;font-size:13px;">
-                        <b style="font-size:14px;">${r.service}</b><br><br>
-                        <b>Customer:</b> ${r.name || "-"}<br>
-                        <b>Phone:</b> ${r.phone || "-"}<br>
-                        <b>Driver:</b> ${r.assigned_driver || "Not assigned"}<br>
-                        <b>Amount:</b> Tsh ${Number(r.amount||0).toLocaleString()}<br>
-                        <b>Status:</b> ${(r.status||"pending").toUpperCase()}<br>
-                        <b>Payment:</b> ${(r.paymentStatus||"unpaid").toUpperCase()}<br>
-                        <b>Date:</b> ${r.created_at ? new Date(r.created_at).toLocaleDateString('en-GB') : "-"}
-                    </div>
-                `);
-
-            mapMarkers.push(marker);
-        }
-    });
-
-    if(points.length > 0){
-        heatLayer = L.heatLayer(points,{
-            radius:40,
-            blur:30,
-            maxZoom:13,
-            gradient:{0.0:"yellow", 0.5:"orange", 1.0:"red"}
-        }).addTo(leafletMap);
-    }
 }
 
 async function assignDriver(id, driver){
@@ -1063,16 +1205,17 @@ async function assignDriver(id, driver){
             body: JSON.stringify({assigned_driver: driver})
         });
         let data = await res.json();
-        if(data.success){ alert("Driver assigned!"); loadRequests(); }
+        if(data.success){ showToast("Driver assigned!", "success"); loadRequests(); }
     }catch(err){ console.log(err); }
 }
 
 async function deleteRequest(id){
-    if(!confirm("Delete this request?")) return;
+    let ok = await showConfirm("Delete this request?");
+    if(!ok) return;
     try{
         let res = await fetch(`${API}/api/requests/${id}`,{method:"DELETE", headers: authHeader()});
         let data = await res.json();
-        if(data.success) loadRequests();
+        if(data.success){ showToast("Request deleted.", "success"); loadRequests(); }
     }catch(err){ console.log(err); }
 }
 
@@ -1091,13 +1234,12 @@ document.getElementById("driverForm").onsubmit = async function(e){
             body: JSON.stringify({fullname,phone,truck_number,username,password})
         });
         let data = await res.json();
-        if(data.success){ alert("Driver created!"); this.reset(); loadAll(); }
-        else alert(data.error || "Failed");
+        if(data.success){ showToast("Driver created!", "success"); this.reset(); loadAll(); }
+        else showToast(data.error || "Failed", "error");
     }catch(err){ console.log(err); }
 };
 
 loadAll();
-initHeatmap();
 setInterval(loadAll, 60000);
 </script>
 

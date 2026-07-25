@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mwongozo wa Mtumiaji — Sanitation System</title>
+
+<style>
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{ font-family:'Segoe UI', sans-serif; background:#f0f2f5; color:#333; }
+
+.navbar{
+    background:linear-gradient(135deg,#1b5e20,#2e7d32);
+    color:white;
+    padding:15px 30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 2px 10px rgba(0,0,0,0.2);
+    flex-wrap:wrap;
+    gap:10px;
+}
+.navbar h2{ margin:0; font-size:20px; }
+.back-link{
+    background:rgba(255,255,255,0.15);
+    color:white;
+    border:1px solid rgba(255,255,255,0.4);
+    padding:8px 14px;
+    border-radius:6px;
+    text-decoration:none;
+    font-weight:bold;
+    font-size:13px;
+}
+.back-link:hover{ background:rgba(255,255,255,0.3); }
+
+.container{ max-width:900px; margin:0 auto; padding:25px; }
+
+.role-tabs{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:25px;
+}
+.role-tab{
+    padding:12px 20px;
+    background:white;
+    border:2px solid #e0e0e0;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:bold;
+    font-size:14px;
+    color:#555;
+    flex:1;
+    min-width:140px;
+    text-align:center;
+}
+.role-tab.active{ border-color:#2e7d32; background:#e8f5e9; color:#2e7d32; }
+
+.role-panel{ display:none; }
+.role-panel.active{ display:block; }
+
+.intro-box{
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.06);
+    margin-bottom:20px;
+    border-left:5px solid #2e7d32;
+}
+.intro-box p{ font-size:14px; color:#555; line-height:1.6; }
+
+.step-card{
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.06);
+    margin-bottom:15px;
+}
+.step-card h3{
+    color:#1b5e20;
+    font-size:16px;
+    margin-bottom:10px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+.step-num{
+    background:#2e7d32;
+    color:white;
+    width:26px; height:26px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:13px;
+    flex-shrink:0;
+}
+.step-card ol, .step-card ul{ margin-left:20px; font-size:14px; color:#444; line-height:1.8; }
+.step-card p{ font-size:14px; color:#444; line-height:1.7; }
+.step-card .note{
+    margin-top:10px;
+    padding:10px 14px;
+    background:#fff3e0;
+    border-radius:8px;
+    font-size:13px;
+    color:#e65100;
+}
+.step-card code{
+    background:#f0f2f5;
+    padding:2px 6px;
+    border-radius:4px;
+    font-size:13px;
+    color:#1b5e20;
+    font-weight:bold;
+}
+
+@media (max-width:600px){
+    .role-tab{ min-width:100%; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <h2>Mwongozo wa Mtumiaji</h2>
+    <a class="back-link" href="login.html">&larr; Rudi Login</a>
+</div>
+
+<div class="container">
+
+<div class="role-tabs">
+    <div class="role-tab active" id="tab-ewura" onclick="showRole('ewura')">EWURA (Admin)</div>
+    <div class="role-tab" id="tab-operator" onclick="showRole('operator')">Operator</div>
+    <div class="role-tab" id="tab-driver" onclick="showRole('driver')">Driver</div>
+    <div class="role-tab" id="tab-resident" onclick="showRole('resident')">Resident (Mteja)</div>
+</div>
+
+<!-- ================= EWURA ================= -->
+<div class="role-panel active" id="panel-ewura">
+    <div class="intro-box">
+        <p><b>EWURA</b> ndiye mamlaka inayosimamia mfumo mzima — anasajili makampuni ya huduma (Operators), anasimamia uzingatiaji wa taratibu, na kuona takwimu za huduma kote nchini/mkoani.</p>
+    </div>
+
+    <div class="step-card">
+        <h3><span class="step-num">1</span> Kuingia Mfumoni</h3>
+        <p>Fungua <code>login.html</code>, weka username <code>admin</code> na password uliyopewa (default: <code>admin123</code>). Baada ya kuingia utapelekwa moja kwa moja kwenye <b>EWURA Dashboard</b>.</p>
+        <div class="note">Badilisha password ya default mara moja kupitia <b>Settings</b> baada ya kuingia mara ya kwanza.</div>
+    </div>
+
+    <div class="step-card">
+        <h3><span class="step-num">2</span> Kusajili Operator (Kampuni) Mpya</h3>
+        <ol>
+            <li>Bofya <b>Operators</b> kwenye sidebar.</li>
+            <li>Bofya kitufe <b>+ Add Operator</b>.</li>
+            <li>Jaza: Jina la mtu wa mawasiliano, Jina la Biashara, Simu, EWURA License Number, Username, Password.</li>
+            <li>Bofya <b>Register Operator</b>. Operator ataweza kuingia mara moja na taarifa hizo.</li>
+        </ol>
+    </div>
+
+    <div class="step-card">
+        <h3><span class="step-num">3</span> Kusimamia Operators</h3>
+        <ul>
+            <li>Kwenye kila kadi ya operator: <b>Suspend</b> husimamisha muda kampuni isiweze kuingia mfumoni (mfano ukiukwaji wa taratibu).</li>
+            <li><b>Reinstate</b> hurudisha operator aliyesimamishwa kuwa hai tena.</li>
+            <li><b>Delete</b> hufuta operator kabisa — madereva na malori yao yatabaki mfumoni lakini bila kuunganishwa na kampuni yoyote.</li>
+            <li><b>View Drivers</b> hukuonyesha orodha ya madereva wote wa operator huyo, pamoja na idadi ya kazi walizofanya.</li>
+            <li>Tumia <b>Search</b> na <b>Sort</b> juu ya orodha kupata operator haraka, na <b>Active/Suspended</b> tabs kubadili kati ya makampuni yanayofanya kazi na yaliyosimamishwa.</li>
+        </ul>
+    </div>
+
+    <div class="step-card">
+        <h3><span class="step-num">4</span> Kuona Heatmap na Takwimu</h3>
+        <p><b>Demand Heatmap</b> — inaonyesha ramani ya maeneo yenye maombi mengi (rangi nyekundu = mahitaji makubwa). Alama za rangi ya machungwa ni maombi yanayosubiri, kijani ni yaliyokamilika.</p>
+        <p><b>Statistics</b> — inaonyesha <i>Requests by Ward</i> (kuona ni ward gani zina mahitaji makubwa lakini huduma ndogo) na <i>Operator Completion Rate</i> (kutathmini utendaji wa kila kampuni kabla ya kuamua kusimamisha au kuendelea nao).</p>
+    </div>
+
+    <div class="step-card">
+        <h3><span class="step-num">5</span> Zana za Zamani (Legacy Tools)</h3>
+        <p>Bofya <b>Legacy Admin Tools</b> juu kulia kwenye EWURA Dashboard kufikia zana za awali za mfumo: kusimamia maombi moja kwa moja (Pending/Completed/All Requests), kuunda madereva wasiohusiana na operator yoyote, na kuona mapato (Revenue &amp; Stats).</p>
+    </div>
+</div>
+
+<!-- ================= OPERATOR ================= -->
+<div class="role-panel" id="panel-operator">
+    <div class="intro-box">
+        <p><b>Operator</b> ni kampuni ya huduma za usafi iliyosajiliwa na EWURA. Operator anasimamia madereva wake, malori (trucks), anadai kazi mpya, na kuidhinisha malipo ya taslimu.</p>
+    </div>
+
+    <div class="step-card">
+        <h3><span class="step-num">1</span> Kuingia Mfumoni</h3>
+        <p>Tumia username na password ulizopewa na EWURA. Utapelekwa moja kwa moja kwenye <b>Operator Dashboard</b>.</p>
+    </div>
+
+    <div class="step-card">
+        <h3><span class="step-num">2</span> Kuongeza Madereva na Malori</h3>
+        <ol>
+            <li>Kwenye sidebar bofya <b>Drivers</b> &rarr; jaza fomu (Jina, Simu, Username, Password) &rarr; <b>Add Driver</b>.</li>
+            <li>Kwenye sidebar bofya <b>Trucks</b> &rarr; jaza Plate Number na Truck Type &rarr; <b>Register Truck</b>.</li>
+        </ol>
+        <div class="note">Huwezi kudai kazi bila kuwa na dereva mmoja angalau. Truck si lazima — unaweza kudai kazi bila kuchagua truck.</div>
+    </div>
+
+    <div class="step-card">
+        <h3><span class="step-num">3</span> Kudai Kazi Mpya (Claim Jobs)</h3>
+        <ol>
+            <li>Nenda <b>Jobs</b> &rarr; tab ya <b>Available Requests</b> (kazi ambazo hazijadaiwa na operator yeyote).</li>
+            <li>Chagua dereva na (kama unataka) truck kwenye kadi ya ombi husika.</li>
+            <li>Bofya <b>Claim &amp; Assign Driver</b>. Ombi litahamia moja kwa moja kwenye tab ya <b>My Assigned Jobs</b>.</li>
+        </ol>
+        <p>Tumia <b>Search</b>, vichujio vya <b>Status</b>/<b>Payment</b>, na <b>Sort</b> kupata kazi haraka miongoni mwa nyingi.</p>
+    </div>
+
+    <div class="step-card">
+        <h3><span class="step-num">4</span> Kubadilisha Dereva/Truck kwenye Kazi</h3>
+        <p>Kwenye tab ya <b>My Assigned Jobs</b>, chagua dereva/truck mpya kisha bofya <b>Re-Assign Driver</b> — hii ni muhimu kama dereva wa awali hapatikani.</p>
+    </div>
+
+    <div class="step-card">
+        <h3><span class="step-num">5</span> Kuidhinisha Malipo ya Taslimu (Payment Approvals)</h3>
+        <p>Baada ya dereva kudai amepokea pesa taslimu, ombi litaonekana kwenye <b>Payment Approvals</b>. Bofya <b>Approve</b> kama umethibitisha, au <b>Reject</b> kama dereva anahitaji kuwasilisha upya.</p>
+    </div>
+
+    <div class="step-card">
+        <h3><span class="step-num">6</span> Kuthibitisha Kazi kwa Niaba ya Mteja</h3>
+        <p>Kama mteja hajathibitisha kazi imekamilika ndani ya muda, kadi ya kazi (My Assigned Jobs) itaonyesha kitufe <b>Confirm on Resident's Behalf</b> — tumia hii tu baada ya kuthibitisha na dereva/picha kuwa kazi kweli imefanyika.</p>
+    </div>
+</div>
+
+<!-- ================= DRIVER ================= -->
+<div class="role-panel" id="panel-driver">
+    <div class="intro-box">
+        <p><b>Driver</b> ndiye anayefanya kazi ya kukusanya taka/huduma za usafi eneo la mteja. Unaweza kuwa umeajiriwa na operator (kampuni) au kusimamiwa moja kwa moja na EWURA.</p>
+    </div>
+
+    <div class="step-card">
+        <h3><span class="step-num">1</span> Kuingia Mfumoni</h3>
+        <p>Tumia username na password ulizopewa na operator wako (au EWURA). Utapelekwa kwenye <b>Driver Dashboard</b> — jina la kampuni yako (ikiwa upo) litaonekana juu.</p>
+    </div>
+
+    <div class="step-card">
+        <h3><span class="step-num">2</span> Kuona Kazi Ulizogawiwa</h3>
+        <p>Kwenye <b>Active Jobs</b> utaona kwa kila kazi: jina la mteja, simu (bofya kupiga simu moja kwa moja), maelezo/notes aliyoacha mteja, picha ya eneo (kama alipakia), truck uliopewa, na kiungo cha <b>Open in Google Maps</b> kwenda eneo lake.</p>
+    </div>
+
+    <div class="step-card">
+        <h3><span class="step-num">3</span> Kukamilisha Kazi</h3>
+        <ol>
+            <li>Baada ya kumaliza kazi eneo la mteja, chagua picha ya uthibitisho (Upload Proof).</li>
+            <li>Bofya <b>Upload &amp; Complete</b>. Kazi itabadilika kuwa "Completed".</li>
+        </ol>
+    </div>
+
+    <div class="step-card">
+        <h3><span class="step-num">4</span> Kudai Malipo (Cash)</h3>
+        <p>Baada ya kazi kukamilika NA mteja (au operator) kuthibitisha kazi imefanyika vizuri, kitufe <b>Mark Payment as Received</b> kitaonekana — bofya baada ya kupokea pesa taslimu. Malipo yatasubiri idhini ya operator wako kabla ya kuwa "PAID" rasmi.</p>
+        <div class="note">Kwa malipo ya <b>online</b>, hakuna hatua ya ziada — yanathibitishwa kiotomatiki mara mteja anapothibitisha kazi.</div>
+    </div>
+
+    <div class="step-card">
+        <h3><span class="step-num">5</span> Kuona Historia na Mapato</h3>
+        <p><b>Past Jobs</b> — kazi zote zilizokamilika na kulipwa. <b>My Earnings</b> — jumla ya mapato yako, kazi zilizosubiri malipo, na mchanganuo wa mapato kwa aina ya huduma.</p>
+    </div>
+</div>
+
+<!-- ================= RESIDENT ================= -->
+<div class="role-panel" id="panel-resident">
+    <div class="intro-box">
+        <p><b>Resident (Mteja)</b> ndiye mtumiaji anayeomba huduma za usafi (kuondoa taka, septic tank, pit latrine, n.k.) kupitia mfumo huu.</p>
+    </div>
+
+    <div class="step-card">
+        <h3><span class="step-num">1</span> Kujisajili</h3>
+        <ol>
+            <li>Fungua <code>register.html</code>.</li>
+            <li>Jaza: Jina Kamili, Simu, Ward (mfano "Kinondoni"), Username, Password.</li>
+            <li>Bofya <b>Create Account</b> kisha ingia (login) na taarifa hizo.</li>
+        </ol>
+    </div>
+
+    <div class="step-card">
+        <h3><span class="step-num">2</span> Kuomba Huduma Mpya</h3>
+        <ol>
+            <li>Kwenye Dashboard, bofya <b>New Request</b> (kitufe cha "+").</li>
+            <li>Jaza jina, simu, chagua huduma (Septic Tank / Pit Latrine — bei inaonekana moja kwa moja).</li>
+            <li>Andika maelezo ya ziada (mfano alama za eneo) kwenye sehemu ya <b>Notes</b> — haya husaidia dereva kukupata kwa urahisi.</li>
+            <li>Weka picha ya eneo (si lazima) ili dereva aone mazingira kabla ya kufika.</li>
+            <li>Chagua njia ya malipo: <b>Cash</b> au <b>Online</b>.</li>
+            <li>Bofya <b>Get Location</b> kuruhusu mfumo kupata eneo lako (lazima kabla ya kuwasilisha).</li>
+            <li>Bofya <b>Submit Request</b>.</li>
+        </ol>
+    </div>
+
+    <div class="step-card">
+        <h3><span class="step-num">3</span> Kufuatilia Ombi Lako</h3>
+        <p>Kwenye <b>Track Request</b> utaona hatua 4 (tiki) za safari ya ombi lako:</p>
+        <ol>
+            <li><b>Submitted</b> — ombi limepokelewa.</li>
+            <li><b>Driver Assigned</b> — operator amekugawia dereva.</li>
+            <li><b>Service Completed</b> — dereva amemaliza kazi.</li>
+            <li><b>Confirmed &amp; Paid</b> — umethibitisha kazi na malipo yamekamilika (tiki zote zitakuwa kijani mfumo mzima ukiwa umekamilika kabisa).</li>
+        </ol>
+    </div>
+
+    <div class="step-card">
+        <h3><span class="step-num">4</span> Kuthibitisha Kazi Imekamilika</h3>
+        <p>Baada ya dereva kupakia uthibitisho, utaona kitufe <b>Confirm Job Was Completed</b> kwenye ombi lako — bofya baada ya kuridhika na huduma. Kwa malipo ya online, hii pia inathibitisha malipo yako moja kwa moja.</p>
+    </div>
+
+    <div class="step-card">
+        <h3><span class="step-num">5</span> Kutoa Maoni (Feedback)</h3>
+        <p>Baada ya kuthibitisha kazi, unaweza kuandika maoni mafupi kuhusu huduma uliyopata — haya yanaonekana kwa operator na EWURA kusaidia kuboresha huduma.</p>
+    </div>
+
+    <div class="step-card">
+        <h3><span class="step-num">6</span> Historia na Mipangilio</h3>
+        <p><b>My Requests</b> — historia yako yote ya maombi. <b>Settings</b> — badilisha password yako wakati wowote.</p>
+    </div>
+</div>
+
+</div>
+
+<script>
+function showRole(role){
+    document.querySelectorAll(".role-panel").forEach(p => p.classList.remove("active"));
+    document.querySelectorAll(".role-tab").forEach(t => t.classList.remove("active"));
+    document.getElementById("panel-" + role).classList.add("active");
+    document.getElementById("tab-" + role).classList.add("active");
+}
+</script>
+
+</body>
+</html>

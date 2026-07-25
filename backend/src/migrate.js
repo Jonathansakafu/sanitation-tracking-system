@@ -55,6 +55,88 @@ async function ensureTables() {
       PRIMARY KEY (id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
   `)
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS operators (
+      id INT NOT NULL AUTO_INCREMENT,
+      fullname VARCHAR(100) DEFAULT NULL,
+      business_name VARCHAR(150) NOT NULL,
+      phone VARCHAR(30) DEFAULT NULL,
+      ewura_license VARCHAR(100) DEFAULT NULL,
+      username VARCHAR(100) NOT NULL,
+      password VARCHAR(255) NOT NULL,
+      status VARCHAR(20) DEFAULT 'active',
+      suspension_reason TEXT DEFAULT NULL,
+      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (id),
+      UNIQUE KEY username (username)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `)
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS trucks (
+      id INT NOT NULL AUTO_INCREMENT,
+      plate_number VARCHAR(30) NOT NULL,
+      truck_type VARCHAR(50) DEFAULT NULL,
+      operator_id INT DEFAULT NULL,
+      status VARCHAR(20) DEFAULT 'active',
+      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (id),
+      UNIQUE KEY plate_number (plate_number)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `)
+}
+
+// Idempotent "add column if missing" helper, driven by a table + column-def list
+// (mirrors the shape of information_schema checks already used by
+// ensurePaymentMethodColumn, generalized so ~10 new columns across 3 tables
+// don't need one copy-pasted function each).
+async function ensureColumns(table, columns) {
+  const [existing] = await pool.query(
+    `SELECT column_name FROM information_schema.columns
+     WHERE table_schema = DATABASE() AND table_name = ?`,
+    [table]
+  )
+  const existingNames = new Set(existing.map((row) => row.column_name.toLowerCase()))
+
+  for (const { name, definition } of columns) {
+    if (!existingNames.has(name.toLowerCase())) {
+      await pool.query(`ALTER TABLE ${table} ADD COLUMN ${name} ${definition}`)
+      console.log(`Migration: added column '${name}' to '${table}'`)
+    }
+  }
+}
+
+async function ensurePaymentMethodColumn() {
+  await ensureColumns("requests", [
+    { name: "paymentMethod", definition: "VARCHAR(20) DEFAULT 'cash'" }
+  ])
+}
+
+async function ensureUserProfileColumns() {
+  await ensureColumns("users", [
+    { name: "fullname", definition: "VARCHAR(100) DEFAULT NULL" },
+    { name: "phone", definition: "VARCHAR(30) DEFAULT NULL" },
+    { name: "ward", definition: "VARCHAR(100) DEFAULT NULL" }
+  ])
+}
+
+async function ensureDriverOperatorColumn() {
+  await ensureColumns("drivers", [
+    { name: "operator_id", definition: "INT DEFAULT NULL" }
+  ])
+}
+
+async function ensureRequestWorkflowColumns() {
+  await ensureColumns("requests", [
+    { name: "operator_id", definition: "INT DEFAULT NULL" },
+    { name: "driver_id", definition: "INT DEFAULT NULL" },
+    { name: "truck_id", definition: "INT DEFAULT NULL" },
+    { name: "notes", definition: "TEXT DEFAULT NULL" },
+    { name: "confirmation_status", definition: "VARCHAR(30) DEFAULT 'pending'" },
+    { name: "resident_comment", definition: "TEXT DEFAULT NULL" },
+    { name: "site_image", definition: "VARCHAR(255) DEFAULT NULL" }
+  ])
 }
 
 async function hashPlaintextPasswords(table) {
@@ -67,15 +149,20 @@ async function hashPlaintextPasswords(table) {
   }
 }
 
-async function ensurePaymentMethodColumn() {
-  const [cols] = await pool.query(
-    `SELECT COUNT(*) AS c FROM information_schema.columns
-     WHERE table_schema = DATABASE() AND table_name = 'requests' AND column_name = 'paymentMethod'`
-  )
-  if (cols[0].c === 0) {
-    await pool.query(
-      `ALTER TABLE requests ADD COLUMN paymentMethod VARCHAR(20) DEFAULT 'cash'`
-    )
+// One-time (but safe-to-repeat) backfill: older rows only recorded the
+// assigned driver as a username string (assigned_driver). New code reads
+// driver_id (numeric FK) exclusively, so every boot we fill in driver_id
+// for any row that has an assigned_driver but no driver_id yet — never
+// touching rows that already have driver_id set.
+async function backfillDriverIdFromAssignedDriver() {
+  const [result] = await pool.query(`
+    UPDATE requests r
+    JOIN drivers d ON d.username = r.assigned_driver
+    SET r.driver_id = d.id
+    WHERE r.driver_id IS NULL AND r.assigned_driver IS NOT NULL
+  `)
+  if (result.affectedRows > 0) {
+    console.log(`Migration: backfilled driver_id for ${result.affectedRows} request(s) from assigned_driver`)
   }
 }
 
@@ -94,8 +181,13 @@ async function ensureDefaultAdmin() {
 async function runMigrations() {
   await ensureTables()
   await ensurePaymentMethodColumn()
+  await ensureUserProfileColumns()
+  await ensureDriverOperatorColumn()
+  await ensureRequestWorkflowColumns()
   await hashPlaintextPasswords("users")
   await hashPlaintextPasswords("drivers")
+  await hashPlaintextPasswords("operators")
+  await backfillDriverIdFromAssignedDriver()
   await ensureDefaultAdmin()
 }
 

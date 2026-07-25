@@ -47,6 +47,49 @@ body{ font-family:'Segoe UI',sans-serif; background:#f5f5f5; }
     font-weight:bold;
 }
 
+.privacy-btn{
+    background:rgba(255,255,255,0.15);
+    border:1px solid rgba(255,255,255,0.4);
+    color:white;
+    width:34px; height:34px;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:15px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+.privacy-btn:hover{ background:rgba(255,255,255,0.3); }
+
+.lang-btn-sm{
+    padding:5px 9px;
+    border:1px solid rgba(255,255,255,0.4);
+    border-radius:5px;
+    background:rgba(255,255,255,0.1);
+    color:white;
+    cursor:pointer;
+    font-size:11px;
+}
+.lang-btn-sm:hover{ background:rgba(255,255,255,0.25); }
+
+body.privacy-on .money-value{
+    filter:blur(6px);
+    -webkit-user-select:none;
+    user-select:none;
+    transition:filter 0.2s;
+}
+
+.greeting-banner{
+    background:linear-gradient(135deg,#2e7d32,#66bb6a);
+    color:white;
+    padding:20px 25px;
+    border-radius:14px;
+    margin-bottom:20px;
+    box-shadow:0 4px 15px rgba(46,125,50,0.25);
+}
+.greeting-banner h2{ margin:0; font-size:20px; }
+.greeting-banner p{ margin-top:6px; font-size:13px; opacity:0.9; }
+
 .sidebar{
     position:fixed;
     top:60px; left:0;
@@ -209,7 +252,9 @@ body{ font-family:'Segoe UI',sans-serif; background:#f5f5f5; }
     border-radius:12px;
     box-shadow:0 2px 8px rgba(0,0,0,0.06);
     border-left:5px solid #2e7d32;
+    transition:box-shadow 0.2s ease, transform 0.2s ease;
 }
+.request-card:hover{ box-shadow:0 6px 18px rgba(0,0,0,0.1); transform:translateY(-2px); }
 
 .request-card.pending-card{ border-left-color:orange; }
 .request-card.completed-card{ border-left-color:#2e7d32; }
@@ -322,7 +367,9 @@ body{ font-family:'Segoe UI',sans-serif; background:#f5f5f5; }
     box-shadow:0 2px 8px rgba(0,0,0,0.06);
     border-left:5px solid #2e7d32;
     margin-bottom:12px;
+    transition:box-shadow 0.2s ease;
 }
+.past-card:hover{ box-shadow:0 6px 18px rgba(0,0,0,0.1); }
 
 .past-card h4{ margin:0 0 8px; color:#1b5e20; font-size:14px; }
 .past-card p{ font-size:13px; color:#666; margin:3px 0; }
@@ -415,6 +462,39 @@ body{ font-family:'Segoe UI',sans-serif; background:#f5f5f5; }
 @media (max-width:480px){
     .req-grid{ grid-template-columns:1fr; }
 }
+
+/* ---- Toast Notifications ---- */
+#toastContainer{
+    position:fixed; top:70px; right:15px; z-index:99999;
+    display:flex; flex-direction:column; gap:10px; pointer-events:none;
+    max-width:calc(100vw - 30px);
+}
+.toast{
+    min-width:240px; max-width:360px; padding:16px 20px; border-radius:10px;
+    color:#fff; font-size:14px; font-weight:700; box-shadow:0 10px 28px rgba(0,0,0,0.3);
+    border-left:5px solid rgba(255,255,255,0.55); opacity:0; transform:translateX(50px);
+    animation:toastIn 0.3s ease forwards, toastOut 0.3s ease forwards 3.2s; pointer-events:auto;
+}
+.toast.success{ background:#2e7d32; }
+.toast.error{ background:#c62828; }
+.toast.info{ background:#00695c; }
+@keyframes toastIn{ to{ opacity:1; transform:translateX(0); } }
+@keyframes toastOut{ to{ opacity:0; transform:translateX(50px); } }
+
+/* ---- Confirm Dialog ---- */
+#confirmOverlay{
+    position:fixed; inset:0; background:rgba(0,0,0,0.78); display:flex;
+    align-items:center; justify-content:center; z-index:100000; padding:20px;
+}
+.confirm-box{
+    background:#fff; padding:0 0 26px; border-radius:16px; max-width:340px; width:100%;
+    text-align:center; box-shadow:0 25px 60px rgba(0,0,0,0.5); border-top:8px solid #2e7d32;
+}
+.confirm-box p{ margin:24px 20px 22px; color:#1b1b1b; font-size:16px; font-weight:700; line-height:1.5; }
+.confirm-actions{ display:flex; gap:10px; justify-content:center; }
+.confirm-btn{ padding:12px 26px; border-radius:9px; border:none; cursor:pointer; font-weight:bold; font-size:15px; }
+.confirm-btn.yes{ background:#2e7d32; color:#fff; }
+.confirm-btn.no{ background:#eee; color:#333; }
 </style>
 </head>
 
@@ -431,9 +511,14 @@ if(!user || user.role !== "driver"){
 <div class="topbar">
     <div class="topbar-left">
         <button type="button" class="menu-btn" onclick="toggleSidebar()">☰</button>
-        <h2> Driver Dashboard</h2>
+        <h2 id="pageTitle"> Driver Dashboard</h2>
     </div>
-    <button type="button" class="logout-btn" onclick="logout()">Logout</button>
+    <div style="display:flex;gap:10px;align-items:center;">
+        <button type="button" class="lang-btn-sm" onclick="setLang('en')">EN</button>
+        <button type="button" class="lang-btn-sm" onclick="setLang('sw')">SW</button>
+        <button type="button" class="privacy-btn" id="privacyBtn" onclick="togglePrivacy()" title="Hide/show earnings">&#128065;</button>
+        <button type="button" class="logout-btn" onclick="logout()">Logout</button>
+    </div>
 </div>
 
 <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
@@ -449,16 +534,19 @@ if(!user || user.role !== "driver"){
 
     <div style="padding:10px 0;">
         <div class="sidebar-item active" onclick="showPanel('home'); closeSidebar();">
-            <span></span> Home
+            <span id="menuHome">Home</span>
         </div>
         <div class="sidebar-item" onclick="showPanel('active'); closeSidebar();">
-            <span></span> Active Jobs
+            <span id="menuActive">Active Jobs</span>
         </div>
         <div class="sidebar-item" onclick="showPanel('past'); closeSidebar();">
-            <span></span> Past Jobs
+            <span id="menuPast">Past Jobs</span>
         </div>
         <div class="sidebar-item" onclick="showPanel('earnings'); closeSidebar();">
-            <span></span> My Earnings
+            <span id="menuEarnings">My Earnings</span>
+        </div>
+        <div class="sidebar-item" onclick="window.location.href='guide.html'">
+            <span id="menuHelp">Help / User Guide</span>
         </div>
 
         <div class="sidebar-divider"></div>
@@ -466,7 +554,7 @@ if(!user || user.role !== "driver"){
         <a class="whatsapp-btn"
             href="https://wa.me/255755067745?text=Hello%2C%20I%20need%20support%20as%20a%20driver."
             target="_blank">
-             Contact Support
+            <span id="menuSupport">Contact Support</span>
         </a>
 
         <button type="button" class="logout-side" onclick="logout()"> Logout</button>
@@ -477,62 +565,67 @@ if(!user || user.role !== "driver"){
 
     <div class="panel active" id="panel-home">
 
+        <div class="greeting-banner">
+            <h2 id="greetingText">Habari!</h2>
+            <p id="liveDateTime"></p>
+        </div>
+
         <div class="driver-card">
             <div>
                 <h2 style="margin:0;color:#1b5e20;"> <span id="driverName"></span></h2>
-                <p style="color:#888;margin-top:4px;font-size:13px;">Driver Account</p>
+                <p style="color:#888;margin-top:4px;font-size:13px;" id="operatorBanner">Driver Account</p>
             </div>
             <div class="stats">
                 <div class="stat-box">
                     <h3 id="totalCount">0</h3>
-                    <p>Total</p>
+                    <p id="statTotal">Total</p>
                 </div>
                 <div class="stat-box">
                     <h3 id="pendingCount">0</h3>
-                    <p>Pending</p>
+                    <p id="statPending">Pending</p>
                 </div>
                 <div class="stat-box">
                     <h3 id="completedCount">0</h3>
-                    <p>Done</p>
+                    <p id="statDone">Done</p>
                 </div>
                 <div class="stat-box" style="background:#e3f2fd;">
-                    <h3 id="earnCount" style="color:#1565c0;">0</h3>
-                    <p>Earned (K)</p>
+                    <h3 id="earnCount" class="money-value" style="color:#1565c0;">0</h3>
+                    <p id="statEarnedK">Earned (K)</p>
                 </div>
             </div>
         </div>
 
-        <div class="section-title"> Active Jobs</div>
+        <div class="section-title" id="sectionActiveHome"> Active Jobs</div>
         <div class="req-grid" id="homeActiveJobs"></div>
 
     </div>
 
     <div class="panel" id="panel-active">
-        <div class="section-title"> Active Jobs</div>
+        <div class="section-title" id="sectionActiveJobs"> Active Jobs</div>
         <div class="req-grid" id="activeJobsGrid"></div>
     </div>
 
     <div class="panel" id="panel-past">
-        <div class="section-title"> Past Jobs (Completed & Paid)</div>
+        <div class="section-title" id="sectionPastJobs"> Past Jobs (Completed & Paid)</div>
         <div id="pastJobsList"></div>
     </div>
 
     <div class="panel" id="panel-earnings">
-        <div class="section-title"> My Earnings</div>
+        <div class="section-title" id="sectionMyEarnings"> My Earnings</div>
         <div class="earn-grid">
             <div class="earn-card">
-                <h4>Total Earned</h4>
-                <div class="earn-num" id="earnTotal">0</div>
+                <h4 id="labelTotalEarned">Total Earned</h4>
+                <div class="earn-num money-value" id="earnTotal">0</div>
                 <div class="earn-sub">TZS all time</div>
             </div>
             <div class="earn-card">
-                <h4>Completed Jobs</h4>
+                <h4 id="labelCompletedJobs">Completed Jobs</h4>
                 <div class="earn-num" id="earnJobs">0</div>
                 <div class="earn-sub">Total jobs done</div>
             </div>
             <div class="earn-card">
-                <h4>Pending Payment</h4>
-                <div class="earn-num" id="earnPending">0</div>
+                <h4 id="labelPendingPayment">Pending Payment</h4>
+                <div class="earn-num money-value" id="earnPending">0</div>
                 <div class="earn-sub">TZS awaiting</div>
             </div>
             <div class="earn-card">
@@ -542,7 +635,7 @@ if(!user || user.role !== "driver"){
             </div>
         </div>
 
-        <div class="section-title"> Earnings by Service</div>
+        <div class="section-title" id="sectionEarningsByService"> Earnings by Service</div>
         <div class="earn-card" id="serviceEarnings"></div>
     </div>
 
@@ -557,9 +650,139 @@ function authHeader(){
     return u && u.token ? { "Authorization": "Bearer " + u.token } : {};
 }
 
-document.getElementById("driverName").innerText = user.username;
-document.getElementById("sidebarName").innerText = user.username;
-document.getElementById("avatarLetter").innerText = user.username.charAt(0).toUpperCase();
+function showToast(message, type){
+    type = type || "info";
+    let container = document.getElementById("toastContainer");
+    if(!container){
+        container = document.createElement("div");
+        container.id = "toastContainer";
+        document.body.appendChild(container);
+    }
+    const toast = document.createElement("div");
+    toast.className = "toast " + type;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3600);
+}
+
+function showConfirm(message){
+    return new Promise((resolve) => {
+        const overlay = document.createElement("div");
+        overlay.id = "confirmOverlay";
+        overlay.innerHTML = `
+            <div class="confirm-box">
+                <p></p>
+                <div class="confirm-actions">
+                    <button class="confirm-btn no">Cancel</button>
+                    <button class="confirm-btn yes">Yes</button>
+                </div>
+            </div>`;
+        overlay.querySelector(".confirm-box p").textContent = message;
+        document.body.appendChild(overlay);
+        overlay.querySelector(".yes").onclick = () => { overlay.remove(); resolve(true); };
+        overlay.querySelector(".no").onclick = () => { overlay.remove(); resolve(false); };
+    });
+}
+
+let displayName = user.fullname || user.username;
+document.getElementById("driverName").innerText = displayName;
+document.getElementById("sidebarName").innerText = displayName;
+document.getElementById("avatarLetter").innerText = displayName.charAt(0).toUpperCase();
+
+// ---- Time-of-day greeting + live clock (respects the site-wide EN/SW preference) ----
+function greetingWord(){
+    let hour = new Date().getHours();
+    let lang = localStorage.getItem("lang") || "en";
+    let phrases = lang === "sw"
+        ? { morning:"Habari za asubuhi", afternoon:"Habari za mchana", evening:"Habari za jioni", night:"Habari za usiku" }
+        : { morning:"Good morning", afternoon:"Good afternoon", evening:"Good evening", night:"Good night" };
+    if(hour < 12) return phrases.morning;
+    if(hour < 18) return phrases.afternoon;
+    if(hour < 22) return phrases.evening;
+    return phrases.night;
+}
+
+function updateClock(){
+    let now = new Date();
+    let lang = localStorage.getItem("lang") || "en";
+    document.getElementById("greetingText").innerText = `${greetingWord()}, ${displayName}!`;
+    document.getElementById("liveDateTime").innerText = now.toLocaleDateString(
+        lang === "sw" ? "sw-TZ" : "en-GB",
+        { weekday:"long", day:"2-digit", month:"long", year:"numeric" }
+    ) + " — " + now.toLocaleTimeString(lang === "sw" ? "sw-TZ" : "en-GB", { hour:"2-digit", minute:"2-digit", second:"2-digit" });
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// ---- Privacy toggle: blur every amount marked .money-value ----
+function updatePrivacyIcon(){
+    let on = document.body.classList.contains("privacy-on");
+    document.getElementById("privacyBtn").innerHTML = on ? "&#128584;" : "&#128065;";
+}
+function togglePrivacy(){
+    document.body.classList.toggle("privacy-on");
+    localStorage.setItem("privacyMode", document.body.classList.contains("privacy-on") ? "on" : "off");
+    updatePrivacyIcon();
+}
+if(localStorage.getItem("privacyMode") === "on") document.body.classList.add("privacy-on");
+updatePrivacyIcon();
+
+// ---- Language toggle ----
+const pageTranslations = {
+    en:{
+        pageTitle:" Driver Dashboard",
+        menuHome:"Home", menuActive:"Active Jobs", menuPast:"Past Jobs",
+        menuEarnings:"My Earnings", menuHelp:"Help / User Guide", menuSupport:"Contact Support",
+        statTotal:"Total", statPending:"Pending", statDone:"Done", statEarnedK:"Earned (K)",
+        sectionActiveHome:" Active Jobs", sectionActiveJobs:" Active Jobs",
+        sectionPastJobs:" Past Jobs (Completed & Paid)", sectionMyEarnings:" My Earnings",
+        sectionEarningsByService:" Earnings by Service",
+        labelTotalEarned:"Total Earned", labelCompletedJobs:"Completed Jobs", labelPendingPayment:"Pending Payment"
+    },
+    sw:{
+        pageTitle:" Dashibodi ya Dereva",
+        menuHome:"Nyumbani", menuActive:"Kazi Zinazoendelea", menuPast:"Kazi Zilizopita",
+        menuEarnings:"Mapato Yangu", menuHelp:"Msaada / Mwongozo", menuSupport:"Wasiliana na Msaada",
+        statTotal:"Jumla", statPending:"Zinazosubiri", statDone:"Zilizokamilika", statEarnedK:"Mapato (K)",
+        sectionActiveHome:" Kazi Zinazoendelea", sectionActiveJobs:" Kazi Zinazoendelea",
+        sectionPastJobs:" Kazi Zilizopita (Zilizokamilika na Kulipwa)", sectionMyEarnings:" Mapato Yangu",
+        sectionEarningsByService:" Mapato kwa Huduma",
+        labelTotalEarned:"Jumla ya Mapato", labelCompletedJobs:"Kazi Zilizokamilika", labelPendingPayment:"Malipo Yanayosubiri"
+    }
+};
+
+function applyPageLang(){
+    let lang = localStorage.getItem("lang") || "en";
+    let t = pageTranslations[lang];
+    Object.keys(t).forEach(id => {
+        let el = document.getElementById(id);
+        if(el) el.innerText = t[id];
+    });
+}
+
+function setLang(lang){
+    localStorage.setItem("lang", lang);
+    applyPageLang();
+    if(typeof updateClock === "function") updateClock();
+    if(typeof renderAll === "function") renderAll();
+}
+applyPageLang();
+
+async function loadOperatorBanner(){
+    let banner = document.getElementById("operatorBanner");
+    if(!user.operator_id){
+        banner.innerText = "Independent / Unassigned";
+        return;
+    }
+    try{
+        let res = await fetch(`${API}/api/operators/${user.operator_id}`, { headers: authHeader() });
+        let data = await res.json();
+        banner.innerText = data.business_name ? `Company: ${data.business_name}` : "Independent / Unassigned";
+    }catch(err){
+        banner.innerText = "Independent / Unassigned";
+    }
+}
+loadOperatorBanner();
 
 function logout(){
     localStorage.clear();
@@ -603,7 +826,7 @@ async function uploadProof(id){
     let file = fileInput.files[0];
 
     if(!file){
-        alert("Please select a photo first!");
+        showToast("Please select a photo first!", "error");
         return;
     }
 
@@ -624,22 +847,23 @@ async function uploadProof(id){
         let data = await res.json();
 
         if(data.success){
-            alert(" Proof uploaded! Request marked as completed.");
+            showToast("Proof uploaded! Request marked as completed.", "success");
             loadRequests();
         } else {
-            alert("Upload failed: " + (data.error || "Unknown error"));
+            showToast("Upload failed: " + (data.error || "Unknown error"), "error");
             btn.innerText = " Upload & Complete";
             btn.disabled = false;
         }
 
     }catch(err){
         console.log(err);
-        alert("Upload failed!");
+        showToast("Upload failed!", "error");
     }
 }
 
 async function markAsPaid(id){
-    if(!confirm("Mark this request as PAID?")) return;
+    let ok = await showConfirm("Claim that cash payment was received for this job?");
+    if(!ok) return;
 
     try{
         let res = await fetch(`${API}/api/payment/${id}`,{
@@ -650,15 +874,32 @@ async function markAsPaid(id){
         let data = await res.json();
 
         if(data.success){
-            alert(" Payment marked as received!");
+            showToast(data.message || "Payment marked as received!", "success");
             loadRequests();
         } else {
-            alert("Failed: " + (data.error || "Unknown error"));
+            showToast("Failed: " + (data.error || "Unknown error"), "error");
         }
 
     }catch(err){
         console.log(err);
+        showToast("Network error. Try again.", "error");
     }
+}
+
+function renderPaymentAction(req){
+    if(req.paymentStatus === "paid"){
+        return `<div class="btn-paid-done"> Payment Received</div>`;
+    }
+    if(req.paymentStatus === "pending_confirmation"){
+        return `<div class="btn-paid-done" style="background:#fff3e0;color:#e65100;"> Awaiting operator approval</div>`;
+    }
+    if(req.confirmation_status === "pending"){
+        return `<div class="btn-paid-done" style="background:#fff3e0;color:#e65100;"> Waiting for resident to confirm completion</div>`;
+    }
+    if(req.paymentMethod === "online"){
+        return `<div class="btn-paid-done"> Online payment — confirmed automatically</div>`;
+    }
+    return `<button type="button" class="btn-paid" onclick="markAsPaid(${req.id})"> Mark Payment as Received</button>`;
 }
 
 function makeActiveCard(req, index){
@@ -671,9 +912,10 @@ function makeActiveCard(req, index){
     return `
         <div class="request-card ${status === 'completed' ? 'completed-card' : 'pending-card'}">
             <h3>#${index+1} ${req.service || "Unknown"}</h3>
-            <p><b> Customer:</b> ${req.name || "-"}</p>
+            <p><b> Resident:</b> ${req.name || "-"}</p>
             <p><b> Phone:</b> <a href="tel:${req.phone}">${req.phone || "-"}</a></p>
-            <p><b> Amount:</b> Tsh ${Number(req.amount||0).toLocaleString()}</p>
+            <p><b> Amount:</b> <span class="money-value">Tsh ${Number(req.amount||0).toLocaleString()}</span></p>
+            ${req.notes ? `<p><b> Notes:</b> ${req.notes}</p>` : ""}
             <p><b> Payment:</b>
                 <b style="color:${isPaid ? 'green' : 'red'}">
                     ${isPaid ? ' PAID' : ' UNPAID'}
@@ -693,16 +935,21 @@ function makeActiveCard(req, index){
                  No location available
             </div>`}
 
+            ${req.truck_plate ? `<p><b> Truck:</b> ${req.truck_plate} (${req.truck_type || "-"})</p>` : ""}
+
+            ${req.site_image ? `
+            <a href="${API}/uploads/${req.site_image}" target="_blank" title="Open full-size resident site photo">
+                <img src="${API}/uploads/${req.site_image}" alt="Resident site photo"
+                    style="width:100%;margin-top:8px;border-radius:6px;max-height:130px;object-fit:cover;">
+            </a>
+            <p style="font-size:11px;color:#999;margin-top:2px;">Resident site photo</p>` : ""}
+
             ${status === "completed" ? `
                 <div style="margin-top:12px;padding:10px;background:#e8f5e9;border-radius:6px;text-align:center;color:#2e7d32;font-weight:bold;">
                      Work Completed
                     ${req.proof_image ? `<br><img src="${API}/uploads/${req.proof_image}" alt="Proof of completion" style="width:100%;margin-top:8px;border-radius:6px;max-height:130px;object-fit:cover;">` : ""}
                 </div>
-                ${!isPaid ? `
-                <button type="button" class="btn-paid" onclick="markAsPaid(${req.id})">
-                     Mark Payment as Received
-                </button>` : `
-                <div class="btn-paid-done"> Payment Received</div>`}
+                ${renderPaymentAction(req)}
             ` : `
             <div class="upload-section">
                 <label> Upload Proof to Complete:</label>
@@ -749,9 +996,9 @@ function renderAll(){
         : past.map((r,i) => `
             <div class="past-card">
                 <h4>#${i+1} ${r.service} — <small style="color:#888;">${r.created_at ? new Date(r.created_at).toLocaleDateString('en-GB') : "-"}</small></h4>
-                <p><b> Customer:</b> ${r.name || "-"}</p>
+                <p><b> Resident:</b> ${r.name || "-"}</p>
                 <p><b> Phone:</b> ${r.phone || "-"}</p>
-                <p><b> Amount:</b> Tsh ${Number(r.amount||0).toLocaleString()}</p>
+                <p><b> Amount:</b> <span class="money-value">Tsh ${Number(r.amount||0).toLocaleString()}</span></p>
                 <p><b> Date:</b> ${r.created_at ? new Date(r.created_at).toLocaleDateString('en-GB', {day:'2-digit',month:'long',year:'numeric'}) : "-"}</p>
                 <span class="tag completed"> COMPLETED</span>
                 <span class="tag paid"> PAID</span>
@@ -784,7 +1031,7 @@ function renderAll(){
             <div class="bar-track">
                 <div class="bar-fill" style="width:${(val/maxS)*100}%"></div>
             </div>
-            <div class="bar-value">Tsh ${val.toLocaleString()}</div>
+            <div class="bar-value money-value">Tsh ${val.toLocaleString()}</div>
         </div>
     `).join("");
 

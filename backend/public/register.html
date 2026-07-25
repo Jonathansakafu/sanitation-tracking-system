@@ -14,16 +14,57 @@ body{
     display:flex;
     justify-content:center;
     align-items:center;
-    height:100vh;
+    min-height:100vh;
+    padding:20px 0;
+    box-sizing:border-box;
 }
+
+.lang-btns{
+    position:fixed;
+    top:15px; left:15px;
+    display:flex;
+    gap:5px;
+}
+.lang-btn{
+    padding:5px 10px;
+    border:1px solid rgba(255,255,255,0.4);
+    border-radius:5px;
+    background:rgba(255,255,255,0.1);
+    color:white;
+    cursor:pointer;
+    font-size:12px;
+}
+.lang-btn:hover{ background:rgba(255,255,255,0.25); }
 
 .box{
     width:300px;
+    max-width:90vw;
+    box-sizing:border-box;
     background:rgba(255,255,255,0.1);
     padding:30px;
     border-radius:15px;
     backdrop-filter:blur(10px);
 }
+
+@media (max-width:400px){
+    .box{ padding:22px; }
+}
+
+#toastContainer{
+    position:fixed; top:15px; right:15px; z-index:99999;
+    display:flex; flex-direction:column; gap:10px; pointer-events:none;
+    max-width:calc(100vw - 30px);
+}
+.toast{
+    min-width:240px; max-width:360px; padding:16px 20px; border-radius:10px;
+    color:#fff; font-size:14px; font-weight:700; box-shadow:0 10px 28px rgba(0,0,0,0.3);
+    border-left:5px solid rgba(255,255,255,0.55); opacity:0; transform:translateX(50px);
+    animation:toastIn 0.3s ease forwards, toastOut 0.3s ease forwards 3.2s; pointer-events:auto;
+}
+.toast.success{ background:#2e7d32; }
+.toast.error{ background:#c62828; }
+@keyframes toastIn{ to{ opacity:1; transform:translateX(0); } }
+@keyframes toastOut{ to{ opacity:0; transform:translateX(50px); } }
 
 input{
     width:100%;
@@ -55,22 +96,106 @@ a{ color:white; font-size:13px; }
 
 <body>
 
+<div class="lang-btns">
+    <button type="button" class="lang-btn" onclick="setLang('en')">EN</button>
+    <button type="button" class="lang-btn" onclick="setLang('sw')">SW</button>
+</div>
+
 <div class="box">
-    <h2>Register</h2>
+    <h2 id="pageTitle">Resident Registration</h2>
+    <p style="font-size:12px;opacity:0.85;margin:-5px 0 5px;" id="pageIntro">
+        For residents (Mteja) only. Operators are registered by EWURA and drivers by their operator.
+    </p>
     <form id="form">
+        <input type="text" id="fullname" placeholder="Full Name" required>
+        <input type="text" id="phone" placeholder="Phone Number" required>
+        <input type="text" id="ward" placeholder="Ward (e.g. Kinondoni)" required>
         <input type="text" id="username" placeholder="Username" required>
         <input type="password" id="password" placeholder="Password" required>
-        <button type="submit">Create Account</button>
+        <button type="submit" id="submitBtn">Create Account</button>
     </form>
-    <p>Already have account? <a href="login.html">Login</a></p>
+    <p><span id="haveAccount">Already have account?</span> <a href="login.html" id="loginLink">Login</a></p>
 </div>
 
 <script>
 const API = "";
 
+const translations = {
+    en:{
+        pageTitle:"Resident Registration",
+        pageIntro:"For residents (Mteja) only. Operators are registered by EWURA and drivers by their operator.",
+        fullname:"Full Name",
+        phone:"Phone Number",
+        ward:"Ward (e.g. Kinondoni)",
+        username:"Username",
+        password:"Password",
+        submitBtn:"Create Account",
+        haveAccount:"Already have account?",
+        loginLink:"Login",
+        welcome:"Welcome",
+        serverError:"Server error!"
+    },
+    sw:{
+        pageTitle:"Usajili wa Mkazi",
+        pageIntro:"Kwa wakazi (Mteja) tu. Operators wanasajiliwa na EWURA, na madereva na operator wao.",
+        fullname:"Jina Kamili",
+        phone:"Namba ya Simu",
+        ward:"Kata (mfano Kinondoni)",
+        username:"Jina la Mtumiaji",
+        password:"Password",
+        submitBtn:"Fungua Akaunti",
+        haveAccount:"Una akaunti tayari?",
+        loginLink:"Ingia",
+        welcome:"Karibu",
+        serverError:"Hitilafu ya seva!"
+    }
+};
+
+let currentLang = localStorage.getItem("lang") || "en";
+
+function applyLang(){
+    let t = translations[currentLang];
+    document.getElementById("pageTitle").innerText = t.pageTitle;
+    document.getElementById("pageIntro").innerText = t.pageIntro;
+    document.getElementById("fullname").placeholder = t.fullname;
+    document.getElementById("phone").placeholder = t.phone;
+    document.getElementById("ward").placeholder = t.ward;
+    document.getElementById("username").placeholder = t.username;
+    document.getElementById("password").placeholder = t.password;
+    document.getElementById("submitBtn").innerText = t.submitBtn;
+    document.getElementById("haveAccount").innerText = t.haveAccount;
+    document.getElementById("loginLink").innerText = t.loginLink;
+}
+
+function setLang(lang){
+    localStorage.setItem("lang", lang);
+    currentLang = lang;
+    applyLang();
+}
+
+applyLang();
+
+function showToast(message, type){
+    type = type || "info";
+    let container = document.getElementById("toastContainer");
+    if(!container){
+        container = document.createElement("div");
+        container.id = "toastContainer";
+        document.body.appendChild(container);
+    }
+    const toast = document.createElement("div");
+    toast.className = "toast " + type;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3600);
+}
+
 document.getElementById("form").onsubmit = async function(e){
     e.preventDefault();
 
+    let fullname = document.getElementById("fullname").value.trim();
+    let phone = document.getElementById("phone").value.trim();
+    let ward = document.getElementById("ward").value.trim();
     let username = document.getElementById("username").value.trim();
     let password = document.getElementById("password").value.trim();
 
@@ -78,22 +203,26 @@ document.getElementById("form").onsubmit = async function(e){
         let res = await fetch(`${API}/api/register`,{
             method:"POST",
             headers:{ "Content-Type":"application/json" },
-            body: JSON.stringify({ username, password })
+            body: JSON.stringify({ fullname, phone, ward, username, password })
         });
 
         let data = await res.json();
 
         if(data.error){
-            alert(data.error);
+            showToast(data.error, "error");
             return;
         }
 
-        alert("Account created successfully!");
-        window.location.href = "login.html";
+        // Registration now logs the resident straight in (same shape as /login) —
+        // land them directly on their own dashboard instead of back at login.html.
+        localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("currentUser", data.user.username);
+        showToast(`${translations[currentLang].welcome}, ${data.user.fullname}!`, "success");
+        setTimeout(() => { window.location.href = "index.html"; }, 700);
 
     }catch(err){
         console.log(err);
-        alert("Server error!");
+        showToast(translations[currentLang].serverError, "error");
     }
 };
 </script>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>User Dashboard</title>
+<title>Resident Dashboard</title>
 
 <style>
 *{ box-sizing:border-box; margin:0; padding:0; }
@@ -60,6 +60,38 @@ body{
 }
 
 .lang-btn:hover{ background:rgba(255,255,255,0.25); }
+
+.privacy-btn{
+    background:rgba(255,255,255,0.15);
+    border:1px solid rgba(255,255,255,0.4);
+    color:white;
+    width:34px; height:34px;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:15px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+.privacy-btn:hover{ background:rgba(255,255,255,0.3); }
+
+body.privacy-on .money-value{
+    filter:blur(6px);
+    -webkit-user-select:none;
+    user-select:none;
+    transition:filter 0.2s;
+}
+
+.greeting-banner{
+    background:linear-gradient(135deg,#2e7d32,#66bb6a);
+    color:white;
+    padding:20px 25px;
+    border-radius:14px;
+    margin-bottom:20px;
+    box-shadow:0 4px 15px rgba(46,125,50,0.25);
+}
+.greeting-banner h2{ margin:0; font-size:20px; }
+.greeting-banner p{ margin-top:6px; font-size:13px; opacity:0.9; }
 
 .notif-bell{
     position:relative;
@@ -385,12 +417,14 @@ body{
 
 .req-item{
     background:white;
+    transition:box-shadow 0.2s ease, transform 0.2s ease;
     padding:18px;
     margin-bottom:12px;
     border-radius:12px;
     border-left:5px solid #2e7d32;
     box-shadow:0 2px 8px rgba(0,0,0,0.06);
 }
+.req-item:hover{ box-shadow:0 6px 18px rgba(0,0,0,0.1); transform:translateY(-2px); }
 
 .req-item.pending-item{ border-left-color:orange; }
 .req-item.completed-item{ border-left-color:#2e7d32; }
@@ -412,6 +446,7 @@ body{
 .tag.completed{ background:#e8f5e9; color:#2e7d32; }
 .tag.unpaid{ background:#ffebee; color:#c62828; }
 .tag.paid{ background:#e8f5e9; color:#2e7d32; }
+.tag.pending_confirmation{ background:#fff3e0; color:#e65100; }
 
 .fab{
     position:fixed;
@@ -440,6 +475,24 @@ body{
 }
 
 .empty .e-icon{ font-size:48px; margin-bottom:10px; }
+
+/* ---- Toast Notifications ---- */
+#toastContainer{
+    position:fixed; top:70px; right:15px; z-index:99999;
+    display:flex; flex-direction:column; gap:10px; pointer-events:none;
+    max-width:calc(100vw - 30px);
+}
+.toast{
+    min-width:240px; max-width:360px; padding:16px 20px; border-radius:10px;
+    color:#fff; font-size:14px; font-weight:700; box-shadow:0 10px 28px rgba(0,0,0,0.3);
+    border-left:5px solid rgba(255,255,255,0.55); opacity:0; transform:translateX(50px);
+    animation:toastIn 0.3s ease forwards, toastOut 0.3s ease forwards 3.2s; pointer-events:auto;
+}
+.toast.success{ background:#2e7d32; }
+.toast.error{ background:#c62828; }
+.toast.info{ background:#00695c; }
+@keyframes toastIn{ to{ opacity:1; transform:translateX(0); } }
+@keyframes toastOut{ to{ opacity:0; transform:translateX(50px); } }
 </style>
 </head>
 
@@ -462,6 +515,7 @@ else if(userData.role === "driver"){ window.location.href = "driver.html"; }
             <button type="button" class="lang-btn" onclick="setLang('en')">EN</button>
             <button type="button" class="lang-btn" onclick="setLang('sw')">SW</button>
         </div>
+        <button type="button" class="privacy-btn" id="privacyBtn" onclick="togglePrivacy()" title="Hide/show money amounts">&#128065;</button>
         <div class="notif-bell" onclick="toggleNotif()">
             &#128276;
             <div class="notif-dot" id="notifDot" style="display:none;">0</div>
@@ -483,7 +537,7 @@ else if(userData.role === "driver"){ window.location.href = "driver.html"; }
         <div class="avatar" id="avatarLetter">U</div>
         <div class="sidebar-user-info">
             <h4 id="sidebarUsername">User</h4>
-            <p>Customer</p>
+            <p>Resident (Mteja)</p>
         </div>
     </div>
 
@@ -500,6 +554,12 @@ else if(userData.role === "driver"){ window.location.href = "driver.html"; }
         <div class="sidebar-item" onclick="window.location.href='request.html'; closeSidebar();">
             <span id="menuNew">New Request</span>
         </div>
+        <div class="sidebar-item" onclick="showPanel('settings'); closeSidebar();">
+            <span id="menuSettings">Settings</span>
+        </div>
+        <div class="sidebar-item" onclick="window.location.href='guide.html'">
+            <span id="menuHelp">Help / User Guide</span>
+        </div>
 
         <div class="sidebar-divider"></div>
 
@@ -514,6 +574,11 @@ else if(userData.role === "driver"){ window.location.href = "driver.html"; }
 <div class="main">
 
     <div class="panel active" id="panel-home">
+
+        <div class="greeting-banner">
+            <h2 id="greetingText">Habari!</h2>
+            <p id="liveDateTime"></p>
+        </div>
 
         <div class="stat-cards">
             <div class="stat-card blue">
@@ -530,7 +595,7 @@ else if(userData.role === "driver"){ window.location.href = "driver.html"; }
             </div>
             <div class="stat-card purple">
                 <div class="s-label" id="labelSpent">Total Spent</div>
-                <div class="s-num" id="totalSpent">0</div>
+                <div class="s-num money-value" id="totalSpent">0</div>
             </div>
         </div>
 
@@ -552,6 +617,21 @@ else if(userData.role === "driver"){ window.location.href = "driver.html"; }
         <div id="historyList"></div>
     </div>
 
+    <div class="panel" id="panel-settings">
+        <div class="section-title" id="changePassword">Change Password</div>
+        <div class="tracker" style="max-width:400px;">
+            <form id="passwordForm">
+                <input type="password" id="oldPassword" placeholder="Current Password" required
+                    style="width:100%;padding:12px;margin-bottom:10px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;">
+                <input type="password" id="newPassword" placeholder="New Password" required
+                    style="width:100%;padding:12px;margin-bottom:10px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;">
+                <button type="submit" style="width:100%;padding:12px;background:#2e7d32;color:white;border:none;border-radius:8px;font-weight:bold;cursor:pointer;">
+                    Update Password
+                </button>
+            </form>
+        </div>
+    </div>
+
 </div>
 
 <button type="button" class="fab" onclick="window.location.href='request.html'" title="New Request">+</button>
@@ -563,6 +643,21 @@ let allMyData = [];
 function authHeader(){
     const u = JSON.parse(localStorage.getItem("user"));
     return u && u.token ? { "Authorization": "Bearer " + u.token } : {};
+}
+
+function showToast(message, type){
+    type = type || "info";
+    let container = document.getElementById("toastContainer");
+    if(!container){
+        container = document.createElement("div");
+        container.id = "toastContainer";
+        document.body.appendChild(container);
+    }
+    const toast = document.createElement("div");
+    toast.className = "toast " + type;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3600);
 }
 
 let translations = {
@@ -585,7 +680,17 @@ let translations = {
         payment:"Payment",
         amount:"Amount",
         driver:"Driver",
-        noDriver:"Waiting for assignment"
+        noDriver:"Waiting for assignment",
+        goodMorning:"Good morning",
+        goodAfternoon:"Good afternoon",
+        goodEvening:"Good evening",
+        goodNight:"Good night",
+        menuSettings:"Settings",
+        menuHelp:"Help / User Guide",
+        changePassword:"Change Password",
+        currentPassword:"Current Password",
+        newPassword:"New Password",
+        updatePassword:"Update Password"
     },
     sw:{
         topTitle:"Dashibodi Yangu",
@@ -606,7 +711,17 @@ let translations = {
         payment:"Malipo",
         amount:"Kiasi",
         driver:"Dereva",
-        noDriver:"Inasubiri ugawaji"
+        noDriver:"Inasubiri ugawaji",
+        goodMorning:"Habari za asubuhi",
+        goodAfternoon:"Habari za mchana",
+        goodEvening:"Habari za jioni",
+        goodNight:"Habari za usiku",
+        menuSettings:"Mipangilio",
+        menuHelp:"Msaada / Mwongozo",
+        changePassword:"Badilisha Password",
+        currentPassword:"Password ya Sasa",
+        newPassword:"Password Mpya",
+        updatePassword:"Sasisha Password"
     }
 };
 
@@ -616,7 +731,8 @@ function applyLang(){
     let t = translations[currentLang];
     let ids = ["topTitle","menuHome","menuTrack","menuHistory","menuNew",
                "labelTotal","labelPending","labelCompleted","labelSpent",
-               "activeTitle","recentTitle","trackTitle","historyTitle"];
+               "activeTitle","recentTitle","trackTitle","historyTitle",
+               "menuSettings","menuHelp","changePassword"];
     ids.forEach(id => {
         let el = document.getElementById(id);
         if(el) el.innerText = t[id] || "";
@@ -628,6 +744,7 @@ function setLang(lang){
     currentLang = lang;
     applyLang();
     renderAll();
+    if(typeof updateClock === "function") updateClock();
 }
 
 applyLang();
@@ -656,7 +773,7 @@ function showPanel(name){
     document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
     document.querySelectorAll(".sidebar-item").forEach(s => s.classList.remove("active"));
     document.getElementById("panel-" + name).classList.add("active");
-    let map = {home:0, track:1, history:2};
+    let map = {home:0, track:1, history:2, settings:3};
     if(map[name] !== undefined){
         document.querySelectorAll(".sidebar-item")[map[name]].classList.add("active");
     }
@@ -679,9 +796,21 @@ function timeAgo(dateStr){
 }
 
 function getStep(req){
-    if(req.status === "completed") return 3;
-    if(req.assigned_driver) return 2;
-    return 1;
+    if(req.status !== "completed"){
+        return req.assigned_driver ? 2 : 1;
+    }
+    let fullyDone = req.confirmation_status !== "pending" && req.paymentStatus === "paid";
+    return fullyDone ? 5 : 4;
+}
+
+function paymentTagHTML(paymentStatus){
+    if(paymentStatus === "paid"){
+        return `<span class="tag paid">PAID</span>`;
+    }
+    if(paymentStatus === "pending_confirmation"){
+        return `<span class="tag pending_confirmation">AWAITING APPROVAL</span>`;
+    }
+    return `<span class="tag unpaid">UNPAID</span>`;
 }
 
 function renderTracker(req, index){
@@ -691,7 +820,8 @@ function renderTracker(req, index){
     let steps = [
         { label:"Submitted" },
         { label:"Driver Assigned" },
-        { label:"Completed" }
+        { label:"Service Completed" },
+        { label:"Confirmed & Paid" }
     ];
 
     let stepsHTML = "";
@@ -711,6 +841,43 @@ function renderTracker(req, index){
         }
     });
 
+    let truckLine = req.truck_plate
+        ? `<div style="margin-top:8px;font-size:13px;color:#555;">Truck: ${req.truck_plate} (${req.truck_type || "-"})</div>`
+        : "";
+
+    let confirmBlock = "";
+    if(req.status === "completed"){
+        if(req.confirmation_status === "pending"){
+            confirmBlock = `
+            <button type="button" onclick="confirmCompletion(${req.id})"
+                style="margin-top:10px;width:100%;padding:10px;background:#2e7d32;color:white;border:none;border-radius:8px;font-weight:bold;cursor:pointer;">
+                Confirm Job Was Completed
+            </button>`;
+        } else if(req.resident_comment){
+            confirmBlock = `
+            <div style="margin-top:10px;padding:10px 15px;background:#f1f8e9;border-radius:8px;font-size:13px;color:#33691e;">
+                <b>Your feedback:</b> ${req.resident_comment}
+            </div>`;
+        } else {
+            confirmBlock = `
+            <div style="margin-top:10px;display:flex;gap:8px;">
+                <input type="text" id="comment-${req.id}" placeholder="Leave feedback (optional)"
+                    style="flex:1;padding:8px;border:1px solid #ddd;border-radius:6px;">
+                <button type="button" onclick="submitComment(${req.id})"
+                    style="padding:8px 14px;background:#1565c0;color:white;border:none;border-radius:6px;cursor:pointer;">
+                    Send
+                </button>
+            </div>`;
+        }
+    }
+
+    let paymentNote = "";
+    if(step === 4 && req.confirmation_status !== "pending"){
+        paymentNote = req.paymentStatus === "pending_confirmation"
+            ? `<div style="margin-top:8px;padding:8px 12px;background:#fff3e0;border-radius:6px;font-size:12px;color:#e65100;">Payment claimed by driver — waiting for operator approval.</div>`
+            : `<div style="margin-top:8px;padding:8px 12px;background:#fff3e0;border-radius:6px;font-size:12px;color:#e65100;">Waiting for payment to be settled.</div>`;
+    }
+
     return `
         <div class="tracker-req">
             <h4>#${index+1} ${req.service} —
@@ -725,8 +892,39 @@ function renderTracker(req, index){
             <div style="margin-top:12px;padding:10px 15px;background:#fff3e0;border-radius:8px;font-size:13px;color:#e65100;">
                 ${t.noDriver}
             </div>`}
+            ${truckLine}
+            ${confirmBlock}
+            ${paymentNote}
         </div>
     `;
+}
+
+async function confirmCompletion(id){
+    try{
+        let res = await fetch(`${API}/api/requests/${id}/confirm-completion`,{
+            method:"PUT",
+            headers: authHeader()
+        });
+        let data = await res.json();
+        if(data.success){ showToast("Thanks for confirming!", "success"); loadData(); }
+        else showToast(data.error || "Failed", "error");
+    }catch(err){ console.log(err); showToast("Network error. Try again.", "error"); }
+}
+
+async function submitComment(id){
+    let input = document.getElementById("comment-" + id);
+    let comment = input.value.trim();
+    if(!comment) return;
+    try{
+        let res = await fetch(`${API}/api/requests/${id}/comment`,{
+            method:"PUT",
+            headers:{ "Content-Type":"application/json", ...authHeader() },
+            body: JSON.stringify({ comment })
+        });
+        let data = await res.json();
+        if(data.success){ showToast("Feedback sent!", "success"); loadData(); }
+        else showToast(data.error || "Failed", "error");
+    }catch(err){ console.log(err); showToast("Network error. Try again.", "error"); }
 }
 
 function renderAll(){
@@ -749,11 +947,11 @@ function renderAll(){
         : active.map(r => `
             <div class="req-item pending-item">
                 <h4>${r.service}</h4>
-                <p><b>Amount:</b> Tsh ${Number(r.amount||0).toLocaleString()}</p>
+                <p><b>Amount:</b> <span class="money-value">Tsh ${Number(r.amount||0).toLocaleString()}</span></p>
                 <p><b>Driver:</b> ${r.assigned_driver || "Not yet assigned"}</p>
                 <p><b>Status:</b> ${r.assigned_driver ? "In Progress" : "Waiting"}</p>
                 <span class="tag pending">PENDING</span>
-                <span class="tag ${r.paymentStatus === 'paid' ? 'paid' : 'unpaid'}">${(r.paymentStatus||"unpaid").toUpperCase()}</span>
+                ${paymentTagHTML(r.paymentStatus)}
             </div>
         `).join("");
     document.getElementById("activeJobs").innerHTML = activeHTML;
@@ -766,10 +964,10 @@ function renderAll(){
             return `
                 <div class="req-item ${status === 'completed' ? 'completed-item' : 'pending-item'}">
                     <h4>${r.service}</h4>
-                    <p>${t.amount}: Tsh ${Number(r.amount||0).toLocaleString()}</p>
+                    <p>${t.amount}: <span class="money-value">Tsh ${Number(r.amount||0).toLocaleString()}</span></p>
                     <p>${t.driver}: ${r.assigned_driver || t.noDriver}</p>
                     <span class="tag ${status}">${status.toUpperCase()}</span>
-                    <span class="tag ${r.paymentStatus === 'paid' ? 'paid' : 'unpaid'}">${(r.paymentStatus||"unpaid").toUpperCase()}</span>
+                    ${paymentTagHTML(r.paymentStatus)}
                 </div>
             `;
         }).join("");
@@ -784,17 +982,17 @@ function renderAll(){
         ? `<div class="empty"><div class="e-icon"></div>${t.noData}</div>`
         : data.map(r => {
             let status = r.status || "pending";
-            let isPaid = r.paymentStatus === "paid";
             return `
                 <div class="req-item ${status === 'completed' ? 'completed-item' : 'pending-item'}">
                     <h4>${r.service} — #${r.id}</h4>
                     <p><b>Name:</b> ${r.name}</p>
                     <p><b>Phone:</b> ${r.phone}</p>
-                    <p><b>Amount:</b> Tsh ${Number(r.amount||0).toLocaleString()}</p>
+                    <p><b>Amount:</b> <span class="money-value">Tsh ${Number(r.amount||0).toLocaleString()}</span></p>
+                    ${r.notes ? `<p><b>Notes:</b> ${r.notes}</p>` : ""}
                     <p><b>${t.driver}:</b> ${r.assigned_driver || t.noDriver}</p>
                     <p><b>Date:</b> ${r.created_at ? new Date(r.created_at).toLocaleDateString('en-GB') : "-"}</p>
                     <span class="tag ${status}">${status.toUpperCase()}</span>
-                    <span class="tag ${isPaid ? 'paid' : 'unpaid'}">${isPaid ? 'PAID' : 'UNPAID'}</span>
+                    ${paymentTagHTML(r.paymentStatus)}
                 </div>
             `;
         }).join("");
@@ -852,8 +1050,43 @@ function renderNotifications(data){
     `).join("");
 }
 
-document.getElementById("sidebarUsername").innerText = userData.username;
-document.getElementById("avatarLetter").innerText    = userData.username.charAt(0).toUpperCase();
+let displayName = userData.fullname || userData.username;
+document.getElementById("sidebarUsername").innerText = displayName;
+document.getElementById("avatarLetter").innerText    = displayName.charAt(0).toUpperCase();
+
+// ---- Time-of-day greeting + live clock ----
+function greetingWord(){
+    let hour = new Date().getHours();
+    let t = translations[currentLang];
+    if(hour < 12) return t.goodMorning;
+    if(hour < 18) return t.goodAfternoon;
+    if(hour < 22) return t.goodEvening;
+    return t.goodNight;
+}
+
+function updateClock(){
+    let now = new Date();
+    document.getElementById("greetingText").innerText = `${greetingWord()}, ${displayName}!`;
+    document.getElementById("liveDateTime").innerText = now.toLocaleDateString(
+        currentLang === "sw" ? "sw-TZ" : "en-GB",
+        { weekday:"long", day:"2-digit", month:"long", year:"numeric" }
+    ) + " — " + now.toLocaleTimeString(currentLang === "sw" ? "sw-TZ" : "en-GB", { hour:"2-digit", minute:"2-digit", second:"2-digit" });
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// ---- Privacy toggle: blur every amount marked .money-value ----
+function updatePrivacyIcon(){
+    let on = document.body.classList.contains("privacy-on");
+    document.getElementById("privacyBtn").innerHTML = on ? "&#128584;" : "&#128065;";
+}
+function togglePrivacy(){
+    document.body.classList.toggle("privacy-on");
+    localStorage.setItem("privacyMode", document.body.classList.contains("privacy-on") ? "on" : "off");
+    updatePrivacyIcon();
+}
+if(localStorage.getItem("privacyMode") === "on") document.body.classList.add("privacy-on");
+updatePrivacyIcon();
 
 async function loadData(){
     try{
@@ -865,6 +1098,26 @@ async function loadData(){
         console.log("Load error:", err);
     }
 }
+
+document.getElementById("passwordForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    let oldPassword = document.getElementById("oldPassword").value;
+    let newPassword = document.getElementById("newPassword").value;
+    try{
+        let res = await fetch(`${API}/api/users/change-password`,{
+            method:"PUT",
+            headers:{ "Content-Type":"application/json", ...authHeader() },
+            body: JSON.stringify({ oldPassword, newPassword })
+        });
+        let data = await res.json();
+        if(data.success){
+            showToast("Password updated!", "success");
+            document.getElementById("passwordForm").reset();
+        } else {
+            showToast(data.error || "Failed to update password", "error");
+        }
+    }catch(err){ console.log(err); showToast("Network error. Try again.", "error"); }
+});
 
 loadData();
 setInterval(loadData, 30000);

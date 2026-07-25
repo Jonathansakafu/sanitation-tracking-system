@@ -52,10 +52,18 @@ body{
     padding:30px;
     border-radius:15px;
     box-shadow:0 5px 20px rgba(0,0,0,0.1);
+    box-sizing:border-box;
 }
 
 .row{display:flex;gap:15px;}
 .input-group{flex:1;margin-bottom:15px;}
+
+@media (max-width:768px){
+    .container{ width:92%; margin:20px auto; padding:20px; }
+    .row{ flex-direction:column; gap:0; }
+    .header{ padding:15px 20px; flex-wrap:wrap; gap:8px; }
+    .header h2{ font-size:18px; }
+}
 
 input, select{
     width:100%;
@@ -101,6 +109,38 @@ button{
     display:block;
     margin-bottom:5px;
 }
+
+textarea{
+    width:100%;
+    padding:12px;
+    border-radius:8px;
+    border:1px solid #ccc;
+    box-sizing:border-box;
+    font-family:inherit;
+    resize:vertical;
+}
+
+.file-group{ margin-top:15px; }
+.file-group label{ display:block; margin-bottom:6px; font-weight:bold; color:#555; font-size:14px; }
+.preview-img{ margin-top:8px; max-width:100%; max-height:160px; border-radius:8px; display:none; }
+
+/* ---- Toast Notifications ---- */
+#toastContainer{
+    position:fixed; top:15px; right:15px; z-index:99999;
+    display:flex; flex-direction:column; gap:10px; pointer-events:none;
+    max-width:calc(100vw - 30px);
+}
+.toast{
+    min-width:240px; max-width:360px; padding:16px 20px; border-radius:10px;
+    color:#fff; font-size:14px; font-weight:700; box-shadow:0 10px 28px rgba(0,0,0,0.3);
+    border-left:5px solid rgba(255,255,255,0.55); opacity:0; transform:translateX(50px);
+    animation:toastIn 0.3s ease forwards, toastOut 0.3s ease forwards 3.2s; pointer-events:auto;
+}
+.toast.success{ background:#2e7d32; }
+.toast.error{ background:#c62828; }
+.toast.info{ background:#00695c; }
+@keyframes toastIn{ to{ opacity:1; transform:translateX(0); } }
+@keyframes toastOut{ to{ opacity:0; transform:translateX(50px); } }
 </style>
 </head>
 
@@ -116,16 +156,19 @@ if(!userData){
 </script>
 
 <div class="header">
-    <h2>Sanitation Request</h2>
+    <h2 id="headerTitle">Sanitation Request</h2>
     <div class="header-right">
-        <a href="index.html">Home</a>
+        <a href="index.html" id="homeLink">Home</a>
+        <a href="guide.html" id="helpLink">Help</a>
+        <button type="button" class="lang-btn" onclick="setLang('en')">EN</button>
+        <button type="button" class="lang-btn" onclick="setLang('sw')">SW</button>
     </div>
 </div>
 
 <div class="container">
 
-<h2>New Request</h2>
-<p>Select service and payment method</p>
+<h2 id="formTitle">New Request</h2>
+<p id="formSubtitle">Select service and payment method</p>
 
 <form id="form">
 
@@ -140,9 +183,9 @@ if(!userData){
 
 <div class="input-group">
     <select id="service" required onchange="setPrice()">
-        <option value="">Select Service</option>
-        <option>Septic Tank</option>
-        <option>Pit Latrine</option>
+        <option value="" id="optSelectService">Select Service</option>
+        <option id="optSeptic">Septic Tank</option>
+        <option id="optPit">Pit Latrine</option>
     </select>
 </div>
 
@@ -150,24 +193,34 @@ if(!userData){
     Amount: 0 TZS
 </div>
 
+<div class="input-group" style="margin-top:15px;">
+    <textarea id="notes" rows="3" placeholder="Notes for the driver (optional) — e.g. gate color, landmark"></textarea>
+</div>
+
+<div class="file-group">
+    <label id="sitePhotoLabel">Site Photo (optional)</label>
+    <input type="file" id="siteImage" accept="image/*" onchange="previewSiteImage(this)">
+    <img id="siteImagePreview" class="preview-img" alt="Selected site photo preview">
+</div>
+
 <div class="payment-options">
     <label>
         <input type="radio" name="paymentMethod" value="cash" checked>
-        Pay Cash
+        <span id="payCashLabel">Pay Cash</span>
     </label>
     <label>
         <input type="radio" name="paymentMethod" value="online">
-        Pay Online
+        <span id="payOnlineLabel">Pay Online</span>
     </label>
 </div>
 
-<button type="button" onclick="getLocation()">Get Location</button>
+<button type="button" onclick="getLocation()" id="getLocationBtn">Get Location</button>
 
 <div id="locationBox" class="location-box">
     Location not captured
 </div>
 
-<button type="submit">Submit Request</button>
+<button type="submit" id="submitBtn">Submit Request</button>
 
 </form>
 
@@ -182,6 +235,90 @@ function authHeader(){
     return u && u.token ? { "Authorization": "Bearer " + u.token } : {};
 }
 
+function showToast(message, type){
+    type = type || "info";
+    let container = document.getElementById("toastContainer");
+    if(!container){
+        container = document.createElement("div");
+        container.id = "toastContainer";
+        document.body.appendChild(container);
+    }
+    const toast = document.createElement("div");
+    toast.className = "toast " + type;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3600);
+}
+
+// ---- Language toggle ----
+const translations = {
+    en:{
+        headerTitle:"Sanitation Request", homeLink:"Home", helpLink:"Help",
+        formTitle:"New Request", formSubtitle:"Select service and payment method",
+        namePlaceholder:"Full Name", phonePlaceholder:"Phone Number",
+        optSelectService:"Select Service", optSeptic:"Septic Tank", optPit:"Pit Latrine",
+        notesPlaceholder:"Notes for the driver (optional) — e.g. gate color, landmark",
+        sitePhotoLabel:"Site Photo (optional)",
+        payCashLabel:"Pay Cash", payOnlineLabel:"Pay Online",
+        getLocationBtn:"Get Location", locationCaptured:"Location captured successfully",
+        locationNotCaptured:"Location not captured", submitBtn:"Submit Request",
+        amountPrefix:"Amount:", getLocationFirst:"Please get location first!",
+        loginFirst:"Login first!", selectService:"Please select a service!",
+        submitSuccess:"Request submitted successfully!", submitFailed:"Failed:",
+        unknownError:"Unknown error", serverError:"Server error!",
+        locationError:"Could not get location. Please allow location access.",
+        geoNotSupported:"Geolocation not supported by your browser."
+    },
+    sw:{
+        headerTitle:"Ombi la Usafi", homeLink:"Nyumbani", helpLink:"Msaada",
+        formTitle:"Ombi Jipya", formSubtitle:"Chagua huduma na njia ya malipo",
+        namePlaceholder:"Jina Kamili", phonePlaceholder:"Namba ya Simu",
+        optSelectService:"Chagua Huduma", optSeptic:"Septic Tank", optPit:"Pit Latrine",
+        notesPlaceholder:"Maelezo kwa dereva (si lazima) — mfano rangi ya geti, alama za eneo",
+        sitePhotoLabel:"Picha ya Eneo (si lazima)",
+        payCashLabel:"Lipa Taslimu", payOnlineLabel:"Lipa Mtandaoni",
+        getLocationBtn:"Pata Eneo", locationCaptured:"Eneo limepatikana",
+        locationNotCaptured:"Eneo halijapatikana", submitBtn:"Wasilisha Ombi",
+        amountPrefix:"Kiasi:", getLocationFirst:"Tafadhali pata eneo kwanza!",
+        loginFirst:"Ingia kwanza!", selectService:"Tafadhali chagua huduma!",
+        submitSuccess:"Ombi limewasilishwa kwa mafanikio!", submitFailed:"Imeshindwa:",
+        unknownError:"Hitilafu isiyojulikana", serverError:"Hitilafu ya seva!",
+        locationError:"Imeshindwa kupata eneo. Tafadhali ruhusu ufikiaji wa eneo.",
+        geoNotSupported:"Kivinjari chako hakitumii huduma ya eneo."
+    }
+};
+let currentLang = localStorage.getItem("lang") || "en";
+
+function applyLang(){
+    let t = translations[currentLang];
+    document.getElementById("headerTitle").innerText = t.headerTitle;
+    document.getElementById("homeLink").innerText = t.homeLink;
+    document.getElementById("helpLink").innerText = t.helpLink;
+    document.getElementById("formTitle").innerText = t.formTitle;
+    document.getElementById("formSubtitle").innerText = t.formSubtitle;
+    document.getElementById("name").placeholder = t.namePlaceholder;
+    document.getElementById("phone").placeholder = t.phonePlaceholder;
+    document.getElementById("optSelectService").innerText = t.optSelectService;
+    document.getElementById("optSeptic").innerText = t.optSeptic;
+    document.getElementById("optPit").innerText = t.optPit;
+    document.getElementById("notes").placeholder = t.notesPlaceholder;
+    document.getElementById("sitePhotoLabel").innerText = t.sitePhotoLabel;
+    document.getElementById("payCashLabel").innerText = t.payCashLabel;
+    document.getElementById("payOnlineLabel").innerText = t.payOnlineLabel;
+    document.getElementById("getLocationBtn").innerText = t.getLocationBtn;
+    document.getElementById("submitBtn").innerText = t.submitBtn;
+    if(lat === null){
+        document.getElementById("locationBox").innerText = t.locationNotCaptured;
+    }
+    document.getElementById("priceBox").innerText = t.amountPrefix + " " + selectedAmount.toLocaleString() + " TZS";
+}
+
+function setLang(lang){
+    localStorage.setItem("lang", lang);
+    currentLang = lang;
+    applyLang();
+}
+
 // PRICE SYSTEM
 let prices = {
     "Septic Tank": 50000,
@@ -194,7 +331,20 @@ function setPrice(){
     let service = document.getElementById("service").value;
     selectedAmount = prices[service] || 0;
     document.getElementById("priceBox").innerText =
-        "Amount: " + selectedAmount.toLocaleString() + " TZS";
+        translations[currentLang].amountPrefix + " " + selectedAmount.toLocaleString() + " TZS";
+}
+
+// SITE PHOTO PREVIEW
+function previewSiteImage(input){
+    let img = document.getElementById("siteImagePreview");
+    if(input.files && input.files[0]){
+        let reader = new FileReader();
+        reader.onload = function(e){
+            img.src = e.target.result;
+            img.style.display = "block";
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
 }
 
 // LOCATION
@@ -206,22 +356,25 @@ function getLocation(){
         navigator.geolocation.getCurrentPosition(function(pos){
             lat = pos.coords.latitude;
             lng = pos.coords.longitude;
-            document.getElementById("locationBox").innerHTML =
-            "Location captured successfully "
+            document.getElementById("locationBox").innerText = translations[currentLang].locationCaptured;
         }, function(){
-            alert("Could not get location. Please allow location access.");
+            showToast(translations[currentLang].locationError, "error");
         });
     } else {
-        alert("Geolocation not supported by your browser.");
+        showToast(translations[currentLang].geoNotSupported, "error");
     }
 }
+
+applyLang();
 
 // SUBMIT
 document.getElementById("form").onsubmit = async function(e){
     e.preventDefault();
 
+    let t = translations[currentLang];
+
     if(lat === null){
-        alert("Please get location first!");
+        showToast(t.getLocationFirst, "error");
         return;
     }
 
@@ -230,7 +383,7 @@ document.getElementById("form").onsubmit = async function(e){
     const currentUser = userData ? userData.username : null;
 
     if(!currentUser){
-        alert("Login first!");
+        showToast(t.loginFirst, "error");
         window.location.href = "login.html";
         return;
     }
@@ -238,30 +391,31 @@ document.getElementById("form").onsubmit = async function(e){
     let service = document.getElementById("service").value;
 
     if(!service){
-        alert("Please select a service!");
+        showToast(t.selectService, "error");
         return;
     }
 
     let paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
 
-    let payload = {
-        user: currentUser,
-        name: document.getElementById("name").value,
-        phone: document.getElementById("phone").value,
-        service: service,
-        amount: selectedAmount,
-        paymentMethod: paymentMethod,
-        lat: lat,
-        lng: lng
-    };
+    let formData = new FormData();
+    formData.append("name", document.getElementById("name").value);
+    formData.append("phone", document.getElementById("phone").value);
+    formData.append("service", service);
+    formData.append("paymentMethod", paymentMethod);
+    formData.append("lat", lat);
+    formData.append("lng", lng);
+    formData.append("notes", document.getElementById("notes").value);
 
-    console.log("Sending request:", payload);
+    let siteImageInput = document.getElementById("siteImage");
+    if(siteImageInput.files && siteImageInput.files[0]){
+        formData.append("site_image", siteImageInput.files[0]);
+    }
 
     try{
         let res = await fetch(`${API}/api/requests`,{
             method:"POST",
-            headers:{ "Content-Type":"application/json", ...authHeader() },
-            body: JSON.stringify(payload)
+            headers: authHeader(),
+            body: formData
         });
 
         let data = await res.json();
@@ -269,14 +423,14 @@ document.getElementById("form").onsubmit = async function(e){
         console.log("Response:", data);
 
         if(data.success){
-            alert("✅ Request submitted successfully!");
-            window.location.href = "index.html";
+            showToast(t.submitSuccess, "success");
+            setTimeout(() => { window.location.href = "index.html"; }, 800);
         } else {
-            alert("Failed: " + (data.error || "Unknown error"));
+            showToast(t.submitFailed + " " + (data.error || t.unknownError), "error");
         }
 
     }catch(err){
-        alert("Server error!");
+        showToast(t.serverError, "error");
         console.log(err);
     }
 };

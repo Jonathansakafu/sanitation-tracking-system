@@ -112,8 +112,9 @@ footer{
 <script>
 const existingUser = JSON.parse(localStorage.getItem("user"));
 if(existingUser){
-    if(existingUser.role === "admin"){ window.location.href = "admin.html"; }
+    if(existingUser.role === "admin"){ window.location.href = "ewura.html"; }
     else if(existingUser.role === "driver"){ window.location.href = "driver.html"; }
+    else if(existingUser.role === "operator"){ window.location.href = "operator.html"; }
     else{ window.location.href = "index.html"; }
 }
 </script>
@@ -122,6 +123,7 @@ if(existingUser){
     <h2 id="navTitle"></h2>
     <div class="nav-right">
         <a href="#about" id="aboutLink" style="color:white;"></a>
+        <a href="guide.html" style="color:white;">Help</a>
         <button type="button" onclick="setLang('en')">EN</button>
         <button type="button" onclick="setLang('sw')">SW</button>
     </div>
@@ -246,10 +248,13 @@ document.getElementById("loginForm").addEventListener("submit", async (e)=>{
             localStorage.setItem("currentUser", data.user.username);
 
             if(data.role === "admin"){
-                window.location.href = "admin.html";
+                window.location.href = "ewura.html";
             }
             else if(data.role === "driver"){
                 window.location.href = "driver.html";
+            }
+            else if(data.role === "operator"){
+                window.location.href = "operator.html";
             }
             else{
                 window.location.href = "index.html";
