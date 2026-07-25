@@ -543,6 +543,76 @@ body.privacy-on .money-value{
     color:#888;
     font-size:14px;
 }
+
+/* ---- Auto-generated from inline styles ---- */
+.gen-1{
+    background:#e3f2fd;
+}
+.gen-2{
+    color:#1565c0;
+}
+.gen-3{
+    display:none;
+}
+.gen-4{
+    background:#fff3e0;
+    color:#e65100;
+}
+.gen-5{
+    display:flex;
+    gap:10px;
+    align-items:center;
+}
+.gen-6{
+    padding:10px 0;
+}
+.gen-7{
+    margin:0;
+    color:#1b5e20;
+}
+.gen-8{
+    color:#888;
+    margin-top:4px;
+    font-size:13px;
+}
+.gen-9{
+    margin-top:12px;
+    padding:10px;
+    background:#fff3e0;
+    border-radius:6px;
+    font-size:13px;
+    color:#e65100;
+    text-align:center;
+}
+.gen-10{
+    width:100%;
+    margin-top:8px;
+    border-radius:6px;
+    max-height:130px;
+    object-fit:cover;
+}
+.gen-11{
+    font-size:11px;
+    color:#999;
+    margin-top:2px;
+}
+.gen-12{
+    margin-top:12px;
+    padding:10px;
+    background:#e8f5e9;
+    border-radius:6px;
+    text-align:center;
+    color:#2e7d32;
+    font-weight:bold;
+}
+.gen-13{
+    color:#888;
+}
+.gen-14{
+    color:#aaa;
+    text-align:center;
+    padding:20px;
+}
 </style>
 </head>
 
@@ -558,10 +628,10 @@ if(!user || user.role !== "driver"){
 
 <div class="topbar">
     <div class="topbar-left">
-        <button type="button" class="menu-btn" onclick="toggleSidebar()">☰</button>
+        <button type="button" class="menu-btn" onclick="toggleSidebar()" title="Menu">☰</button>
         <h2 id="pageTitle"> Driver Dashboard</h2>
     </div>
-    <div style="display:flex;gap:10px;align-items:center;">
+    <div class="gen-5">
         <button type="button" class="lang-btn-sm" onclick="setLang('en')">EN</button>
         <button type="button" class="lang-btn-sm" onclick="setLang('sw')">SW</button>
         <button type="button" class="privacy-btn" id="privacyBtn" onclick="togglePrivacy()" title="Hide/show earnings">&#128065;</button>
@@ -580,7 +650,7 @@ if(!user || user.role !== "driver"){
         </div>
     </div>
 
-    <div style="padding:10px 0;">
+    <div class="gen-6">
         <div class="sidebar-item active" onclick="showPanel('home'); closeSidebar();">
             <span id="menuHome">Home</span>
         </div>
@@ -601,7 +671,7 @@ if(!user || user.role !== "driver"){
 
         <a class="whatsapp-btn"
             href="https://wa.me/255755067745?text=Hello%2C%20I%20need%20support%20as%20a%20driver."
-            target="_blank">
+            target="_blank" rel="noopener">
             <span id="menuSupport">Contact Support</span>
         </a>
 
@@ -620,8 +690,8 @@ if(!user || user.role !== "driver"){
 
         <div class="driver-card">
             <div>
-                <h2 style="margin:0;color:#1b5e20;"> <span id="driverName"></span></h2>
-                <p style="color:#888;margin-top:4px;font-size:13px;" id="operatorBanner">Driver Account</p>
+                <h2 class="gen-7"> <span id="driverName"></span></h2>
+                <p class="gen-8" id="operatorBanner">Driver Account</p>
             </div>
             <div class="stats">
                 <div class="stat-box">
@@ -636,8 +706,8 @@ if(!user || user.role !== "driver"){
                     <h3 id="completedCount">0</h3>
                     <p id="statDone">Done</p>
                 </div>
-                <div class="stat-box" style="background:#e3f2fd;">
-                    <h3 id="earnCount" class="money-value" style="color:#1565c0;">0</h3>
+                <div class="stat-box gen-1">
+                    <h3 id="earnCount" class="money-value gen-2">0</h3>
                     <p id="statEarnedK">Earned (K)</p>
                 </div>
             </div>
@@ -694,7 +764,7 @@ if(!user || user.role !== "driver"){
         <button type="button" class="route-modal-close" onclick="closeRouteModal()">&times;</button>
         <h3 id="routeModalTitle">Route to Resident</h3>
         <div id="routeLoading" class="route-loading">Getting your current location...</div>
-        <iframe id="routeFrame" class="route-frame" style="display:none;" src="" title="Route to resident"></iframe>
+        <iframe id="routeFrame" class="route-frame gen-3" src="" title="Route to resident"></iframe>
     </div>
 </div>
 
@@ -983,10 +1053,10 @@ function renderPaymentAction(req){
         return `<div class="btn-paid-done"> Payment Received</div>`;
     }
     if(req.paymentStatus === "pending_confirmation"){
-        return `<div class="btn-paid-done" style="background:#fff3e0;color:#e65100;"> Awaiting operator approval</div>`;
+        return `<div class="btn-paid-done gen-4"> Awaiting operator approval</div>`;
     }
     if(req.confirmation_status === "pending"){
-        return `<div class="btn-paid-done" style="background:#fff3e0;color:#e65100;"> Waiting for resident to confirm completion</div>`;
+        return `<div class="btn-paid-done gen-4"> Waiting for resident to confirm completion</div>`;
     }
     if(req.paymentMethod === "online"){
         return `<div class="btn-paid-done"> Online payment — confirmed automatically</div>`;
@@ -1023,23 +1093,23 @@ function makeActiveCard(req, index){
             <button type="button" class="btn-maps" onclick="showRoute(${lat}, ${lng})">
                  Show Route to Resident
             </button>` : `
-            <div style="margin-top:12px;padding:10px;background:#fff3e0;border-radius:6px;font-size:13px;color:#e65100;text-align:center;">
+            <div class="gen-9">
                  No location available
             </div>`}
 
             ${req.truck_plate ? `<p><b> Truck:</b> ${req.truck_plate} (${req.truck_type || "-"})</p>` : ""}
 
             ${req.site_image ? `
-            <a href="${API}/uploads/${req.site_image}" target="_blank" title="Open full-size resident site photo">
+            <a href="${API}/uploads/${req.site_image}" target="_blank" rel="noopener" title="Open full-size resident site photo">
                 <img src="${API}/uploads/${req.site_image}" alt="Resident site photo"
-                    style="width:100%;margin-top:8px;border-radius:6px;max-height:130px;object-fit:cover;">
+                    class="gen-10">
             </a>
-            <p style="font-size:11px;color:#999;margin-top:2px;">Resident site photo</p>` : ""}
+            <p class="gen-11">Resident site photo</p>` : ""}
 
             ${status === "completed" ? `
-                <div style="margin-top:12px;padding:10px;background:#e8f5e9;border-radius:6px;text-align:center;color:#2e7d32;font-weight:bold;">
+                <div class="gen-12">
                      Work Completed
-                    ${req.proof_image ? `<br><img src="${API}/uploads/${req.proof_image}" alt="Proof of completion" style="width:100%;margin-top:8px;border-radius:6px;max-height:130px;object-fit:cover;">` : ""}
+                    ${req.proof_image ? `<br><img src="${API}/uploads/${req.proof_image}" alt="Proof of completion" class="gen-10">` : ""}
                 </div>
                 ${renderPaymentAction(req)}
             ` : `
@@ -1087,7 +1157,7 @@ function renderAll(){
         ? `<div class="empty"><div class="e-icon"></div>No completed jobs yet</div>`
         : past.map((r,i) => `
             <div class="past-card">
-                <h4>#${i+1} ${r.service} — <small style="color:#888;">${r.created_at ? new Date(r.created_at).toLocaleDateString('en-GB') : "-"}</small></h4>
+                <h4>#${i+1} ${r.service} — <small class="gen-13">${r.created_at ? new Date(r.created_at).toLocaleDateString('en-GB') : "-"}</small></h4>
                 <p><b> Resident:</b> ${r.name || "-"}</p>
                 <p><b> Phone:</b> ${r.phone || "-"}</p>
                 <p><b> Amount:</b> <span class="money-value">Tsh ${Number(r.amount||0).toLocaleString()}</span></p>
@@ -1128,7 +1198,7 @@ function renderAll(){
     `).join("");
 
     document.getElementById("serviceEarnings").innerHTML = serviceHTML ||
-        `<p style="color:#aaa;text-align:center;padding:20px;">No data yet</p>`;
+        `<p class="gen-14">No data yet</p>`;
 }
 
 async function loadRequests(){

@@ -464,6 +464,103 @@ body.privacy-on .money-value{
     .bar-label{ width:100%; }
     .bar-value{ width:100%; text-align:left; }
 }
+
+/* ---- Auto-generated from inline styles ---- */
+.gen-1{
+    background:linear-gradient(to right,yellow,orange,red);
+}
+.gen-2{
+    margin-top:20px;
+}
+.gen-3{
+    width:100%;
+}
+.gen-4{
+    display:flex;
+    gap:10px;
+    align-items:center;
+}
+.gen-5{
+    padding:10px 0;
+}
+.gen-6{
+    margin-top:15px;
+}
+.gen-7{
+    color:#555;
+}
+.gen-8{
+    margin-top:10px;
+    font-size:12px;
+    color:#aaa;
+}
+.gen-9{
+    margin-top:12px;
+    background:#e8f5e9;
+    padding:10px;
+    border-radius:8px;
+}
+.gen-10{
+    font-size:12px;
+    color:#1b5e20;
+    margin-bottom:6px;
+}
+.gen-11{
+    width:100%;
+    margin-top:8px;
+}
+.gen-12{
+    margin-top:12px;
+    border-top:1px dashed #ccc;
+    padding-top:10px;
+}
+.gen-13{
+    margin-top:10px;
+    color:#2e7d32;
+    font-weight:600;
+}
+.gen-14{
+    margin-top:12px;
+    padding:10px 14px;
+    background:#fff8e1;
+    border-radius:8px;
+    border-left:4px solid #f9a825;
+}
+.gen-15{
+    font-size:12px;
+    color:#795548;
+    margin-bottom:8px;
+}
+.gen-16{
+    margin-top:6px;
+}
+.gen-17{
+    font-size:11px;
+    color:#888;
+}
+.gen-18{
+    color:#2e7d32;
+    font-weight:600;
+}
+.gen-19{
+    position:relative;
+    width:30px;
+    height:42px;
+    cursor:pointer;
+}
+.gen-20{
+    min-width:180px;
+    font-family:Segoe UI,sans-serif;
+    font-size:13px;
+}
+.gen-21{
+    font-size:14px;
+}
+.gen-22{
+    color:#aaa;
+    text-align:center;
+    padding:20px;
+}
 </style>
 </head>
 
@@ -479,10 +576,10 @@ if(!user || user.role !== "operator"){
 
 <div class="topbar">
     <div class="topbar-left">
-        <button type="button" class="menu-btn" onclick="toggleSidebar()">&#9776;</button>
+        <button type="button" class="menu-btn" onclick="toggleSidebar()" title="Menu">&#9776;</button>
         <h2 id="pageTitle">Operator Dashboard</h2>
     </div>
-    <div style="display:flex;gap:10px;align-items:center;">
+    <div class="gen-4">
         <button type="button" class="lang-btn-sm" onclick="setLang('en')">EN</button>
         <button type="button" class="lang-btn-sm" onclick="setLang('sw')">SW</button>
         <button type="button" class="privacy-btn" id="privacyBtn" onclick="togglePrivacy()" title="Hide/show revenue">&#128065;</button>
@@ -501,7 +598,7 @@ if(!user || user.role !== "operator"){
         </div>
     </div>
 
-    <div style="padding:10px 0;">
+    <div class="gen-5">
         <div class="sidebar-item active" onclick="showPanel('overview')"><span id="menuOverview">Overview</span></div>
         <div class="sidebar-item" onclick="showPanel('heatmap')"><span id="menuHeatmap">Demand Heatmap</span></div>
         <div class="sidebar-item" onclick="showPanel('jobs')">
@@ -516,7 +613,7 @@ if(!user || user.role !== "operator"){
         <div class="sidebar-item" onclick="showPanel('settings')"><span id="menuSettings">Settings</span></div>
         <div class="sidebar-item" onclick="window.location.href='guide.html'"><span id="menuHelp">Help / User Guide</span></div>
 
-        <button type="button" class="logout-side" onclick="logout()" style="margin-top:15px;">Logout</button>
+        <button type="button" class="logout-side gen-6" onclick="logout()">Logout</button>
     </div>
 </div>
 
@@ -534,7 +631,7 @@ if(!user || user.role !== "operator"){
             <div class="stat-card purple"><h4>Earnings (Tsh)</h4><div class="num money-value" id="statEarnings">0</div></div>
         </div>
         <div class="section-title">Business Info</div>
-        <p style="color:#555;">Logged in as <b id="businessName">-</b></p>
+        <p class="gen-7">Logged in as <b id="businessName">-</b></p>
     </div>
 
     <div class="panel" id="panel-heatmap">
@@ -542,7 +639,7 @@ if(!user || user.role !== "operator"){
         <p class="section-sub">Unclaimed requests and your own jobs, plotted by location — helps you spot high-demand areas before claiming work.</p>
         <div class="map-legend">
             <div class="legend-item">
-                <div class="legend-color" style="background:linear-gradient(to right,yellow,orange,red);"></div>
+                <div class="legend-color gen-1"></div>
                 <span>Low to High demand</span>
             </div>
             <div class="legend-item">
@@ -636,10 +733,10 @@ if(!user || user.role !== "operator"){
             <div class="stat-card orange"><h4>Pending Revenue</h4><div class="num money-value" id="statsPendingRevenue">0</div></div>
         </div>
 
-        <div class="section-title" style="margin-top:20px;">Revenue by Driver</div>
+        <div class="section-title gen-2">Revenue by Driver</div>
         <div class="revenue-bar" id="driverRevenue"></div>
 
-        <div class="section-title" style="margin-top:20px;">Revenue by Service</div>
+        <div class="section-title gen-2">Revenue by Service</div>
         <div class="revenue-bar" id="serviceRevenue"></div>
     </div>
 
@@ -936,41 +1033,41 @@ function jobCardHTML(j){
     if(status === "completed"){
         feedbackHTML = j.resident_comment
             ? `<div class="feedback-box"><div class="fb-label">Resident Feedback</div><div class="fb-text">${j.resident_comment}</div></div>`
-            : `<div style="margin-top:10px;font-size:12px;color:#aaa;">No feedback left by resident yet.</div>`;
+            : `<div class="gen-8">No feedback left by resident yet.</div>`;
     }
 
     let actionHTML = "";
     if(currentJobTab === "available"){
         actionHTML = `
-            <div style="margin-top:12px;background:#e8f5e9;padding:10px;border-radius:8px;">
-                <p style="font-size:12px;color:#1b5e20;margin-bottom:6px;"><b>Claim this job to assign a driver:</b></p>
+            <div class="gen-9">
+                <p class="gen-10"><b>Claim this job to assign a driver:</b></p>
                 <div class="assign-row">
                     <select id="driverSel-${j.id}">${driverOptionsHTML()}</select>
                     <select id="truckSel-${j.id}">${truckOptionsHTML(j.id, j.truck_id)}</select>
                 </div>
-                <button type="button" class="btn-assign" id="assignBtn-${j.id}" style="width:100%;margin-top:8px;" onclick="assignDriver(${j.id})">Claim &amp; Assign Driver</button>
+                <button type="button" class="btn-assign gen-11" id="assignBtn-${j.id}" onclick="assignDriver(${j.id})">Claim &amp; Assign Driver</button>
             </div>
         `;
     } else if(status !== "completed"){
         actionHTML = `
-            <div style="margin-top:12px;border-top:1px dashed #ccc;padding-top:10px;">
+            <div class="gen-12">
                 <div class="assign-row">
                     <select id="driverSel-${j.id}">${driverOptionsHTML(j.driver_id)}</select>
                     <select id="truckSel-${j.id}">${truckOptionsHTML(j.id, j.truck_id)}</select>
                 </div>
-                <button type="button" class="btn-assign" id="assignBtn-${j.id}" style="width:100%;margin-top:8px;" onclick="assignDriver(${j.id})">Re-Assign Driver</button>
+                <button type="button" class="btn-assign gen-11" id="assignBtn-${j.id}" onclick="assignDriver(${j.id})">Re-Assign Driver</button>
             </div>
         `;
     } else {
-        actionHTML = `<p style="margin-top:10px;color:#2e7d32;font-weight:600;">Job closed/fulfilled</p>`;
+        actionHTML = `<p class="gen-13">Job closed/fulfilled</p>`;
     }
 
     let confirmRow = "";
     if(status === "completed" && currentJobTab !== "available" && (j.confirmation_status || "pending") === "pending"){
         confirmRow = `
-            <div style="margin-top:12px;padding:10px 14px;background:#fff8e1;border-radius:8px;border-left:4px solid #f9a825;">
-                <p style="font-size:12px;color:#795548;margin-bottom:8px;">Resident hasn't confirmed this job yet. If you've verified it was done, you can confirm on their behalf.</p>
-                <button type="button" class="btn-assign" style="width:100%;" onclick="operatorConfirm(${j.id})">Confirm on Resident's Behalf</button>
+            <div class="gen-14">
+                <p class="gen-15">Resident hasn't confirmed this job yet. If you've verified it was done, you can confirm on their behalf.</p>
+                <button type="button" class="btn-assign gen-3" onclick="operatorConfirm(${j.id})">Confirm on Resident's Behalf</button>
             </div>
         `;
     }
@@ -985,7 +1082,7 @@ function jobCardHTML(j){
             <p><b>Notes:</b> ${j.notes || "-"}</p>
             <span class="tag ${status}">${status.toUpperCase().replace('_',' ')}</span>
             <span class="tag ${paymentTag(j.paymentStatus).cls}">${paymentTag(j.paymentStatus).label}</span>
-            ${j.truck_plate ? `<p style="margin-top:6px;"><b>Truck:</b> ${j.truck_plate} (${j.truck_type || "-"})</p>` : ""}
+            ${j.truck_plate ? `<p class="gen-16"><b>Truck:</b> ${j.truck_plate} (${j.truck_type || "-"})</p>` : ""}
             ${photosHTML}
             ${feedbackHTML}
             ${actionHTML}
@@ -1185,8 +1282,8 @@ function renderTrucks(){
     document.getElementById("truckList").innerHTML = allTrucks.map(t => {
         let isActive = t.status === "active";
         let usageHTML = t.active_job_id
-            ? `<p><b>In use:</b> Job #${t.active_job_code || t.active_job_id}</p><p style="font-size:11px;color:#888;">Frees up automatically once that job is completed.</p>`
-            : `<p style="color:#2e7d32;font-weight:600;">Available for assignment</p>`;
+            ? `<p><b>In use:</b> Job #${t.active_job_code || t.active_job_id}</p><p class="gen-17">Frees up automatically once that job is completed.</p>`
+            : `<p class="gen-18">Available for assignment</p>`;
 
         return `
             <div class="item-card">
@@ -1326,7 +1423,7 @@ function updateHeatmap(){
             let color = r.status === "completed" ? "#2e7d32" : "orange";
             let icon = L.divIcon({
                 className:"",
-                html:`<div style="position:relative;width:30px;height:42px;cursor:pointer;">
+                html:`<div class="gen-19">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="30" height="42">
                         <path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 24 12 24s12-15 12-24C24 5.4 18.6 0 12 0z"
                             fill="${color}" stroke="white" stroke-width="1.2"/>
@@ -1339,8 +1436,8 @@ function updateHeatmap(){
             let marker = L.marker([lat, lng], {icon})
                 .addTo(leafletMap)
                 .bindPopup(`
-                    <div style="min-width:180px;font-family:Segoe UI,sans-serif;font-size:13px;">
-                        <b style="font-size:14px;">${r.service}</b><br><br>
+                    <div class="gen-20">
+                        <b class="gen-21">${r.service}</b><br><br>
                         <b>Resident:</b> ${r.name || "-"}<br>
                         <b>Ward:</b> ${r.ward || "Unknown"}<br>
                         <b>Amount:</b> <span class="money-value">Tsh ${Number(r.amount||0).toLocaleString()}</span><br>
@@ -1396,7 +1493,7 @@ function renderRevenueStats(){
         </div>
     `).join("");
     document.getElementById("driverRevenue").innerHTML = driverHTML ||
-        `<p style="color:#aaa;text-align:center;padding:20px;">No data yet</p>`;
+        `<p class="gen-22">No data yet</p>`;
 
     let serviceRev = {};
     mine.forEach(r => {
@@ -1412,7 +1509,7 @@ function renderRevenueStats(){
         </div>
     `).join("");
     document.getElementById("serviceRevenue").innerHTML = serviceHTML ||
-        `<p style="color:#aaa;text-align:center;padding:20px;">No data yet</p>`;
+        `<p class="gen-22">No data yet</p>`;
 }
 
 let lastSnapshot = "";

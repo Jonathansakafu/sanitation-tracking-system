@@ -493,6 +493,97 @@ body.privacy-on .money-value{
 .toast.info{ background:#00695c; }
 @keyframes toastIn{ to{ opacity:1; transform:translateX(0); } }
 @keyframes toastOut{ to{ opacity:0; transform:translateX(50px); } }
+
+/* ---- Auto-generated from inline styles ---- */
+.gen-1{
+    margin-top:20px;
+}
+.gen-2{
+    max-width:400px;
+}
+.gen-3{
+    display:none;
+}
+.gen-4{
+    width:100%;
+    padding:12px;
+    margin-bottom:10px;
+    border:1px solid #ddd;
+    border-radius:8px;
+    box-sizing:border-box;
+}
+.gen-5{
+    width:100%;
+    padding:12px;
+    background:#2e7d32;
+    color:white;
+    border:none;
+    border-radius:8px;
+    font-weight:bold;
+    cursor:pointer;
+}
+.gen-6{
+    margin-top:8px;
+    font-size:13px;
+    color:#555;
+}
+.gen-7{
+    margin-top:10px;
+    width:100%;
+    padding:10px;
+    background:#2e7d32;
+    color:white;
+    border:none;
+    border-radius:8px;
+    font-weight:bold;
+    cursor:pointer;
+}
+.gen-8{
+    margin-top:10px;
+    padding:10px 15px;
+    background:#f1f8e9;
+    border-radius:8px;
+    font-size:13px;
+    color:#33691e;
+}
+.gen-9{
+    margin-top:10px;
+    display:flex;
+    gap:8px;
+}
+.gen-10{
+    flex:1;
+    padding:8px;
+    border:1px solid #ddd;
+    border-radius:6px;
+}
+.gen-11{
+    padding:8px 14px;
+    background:#1565c0;
+    color:white;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
+.gen-12{
+    margin-top:8px;
+    padding:8px 12px;
+    background:#fff3e0;
+    border-radius:6px;
+    font-size:12px;
+    color:#e65100;
+}
+.gen-13{
+    color:#888;
+}
+.gen-14{
+    margin-top:12px;
+    padding:10px 15px;
+    background:#fff3e0;
+    border-radius:8px;
+    font-size:13px;
+    color:#e65100;
+}
 </style>
 </head>
 
@@ -507,7 +598,7 @@ else if(userData.role === "driver"){ window.location.href = "driver.html"; }
 
 <div class="topbar">
     <div class="topbar-left">
-        <button type="button" class="menu-btn" onclick="toggleSidebar()">&#9776;</button>
+        <button type="button" class="menu-btn" onclick="toggleSidebar()" title="Menu">&#9776;</button>
         <h2 id="topTitle">My Dashboard</h2>
     </div>
     <div class="topbar-right">
@@ -518,7 +609,7 @@ else if(userData.role === "driver"){ window.location.href = "driver.html"; }
         <button type="button" class="privacy-btn" id="privacyBtn" onclick="togglePrivacy()" title="Hide/show money amounts">&#128065;</button>
         <div class="notif-bell" onclick="toggleNotif()">
             &#128276;
-            <div class="notif-dot" id="notifDot" style="display:none;">0</div>
+            <div class="notif-dot gen-3" id="notifDot">0</div>
         </div>
     </div>
 </div>
@@ -563,7 +654,7 @@ else if(userData.role === "driver"){ window.location.href = "driver.html"; }
 
         <div class="sidebar-divider"></div>
 
-        <a class="whatsapp-btn" href="https://wa.me/255755067745?text=Hello%2C%20I%20need%20help%20with%20sanitation%20services." target="_blank">
+        <a class="whatsapp-btn" href="https://wa.me/255755067745?text=Hello%2C%20I%20need%20help%20with%20sanitation%20services." target="_blank" rel="noopener">
             Contact via WhatsApp
         </a>
 
@@ -602,7 +693,7 @@ else if(userData.role === "driver"){ window.location.href = "driver.html"; }
         <div class="section-title" id="activeTitle">Active Jobs</div>
         <div id="activeJobs"></div>
 
-        <div class="section-title" style="margin-top:20px;" id="recentTitle">Recent Requests</div>
+        <div class="section-title gen-1" id="recentTitle">Recent Requests</div>
         <div id="recentList"></div>
 
     </div>
@@ -619,13 +710,13 @@ else if(userData.role === "driver"){ window.location.href = "driver.html"; }
 
     <div class="panel" id="panel-settings">
         <div class="section-title" id="changePassword">Change Password</div>
-        <div class="tracker" style="max-width:400px;">
+        <div class="tracker gen-2">
             <form id="passwordForm">
                 <input type="password" id="oldPassword" placeholder="Current Password" required
-                    style="width:100%;padding:12px;margin-bottom:10px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;">
+                    class="gen-4">
                 <input type="password" id="newPassword" placeholder="New Password" required
-                    style="width:100%;padding:12px;margin-bottom:10px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;">
-                <button type="submit" style="width:100%;padding:12px;background:#2e7d32;color:white;border:none;border-radius:8px;font-weight:bold;cursor:pointer;">
+                    class="gen-4">
+                <button type="submit" class="gen-5">
                     Update Password
                 </button>
             </form>
@@ -842,7 +933,7 @@ function renderTracker(req, index){
     });
 
     let truckLine = req.truck_plate
-        ? `<div style="margin-top:8px;font-size:13px;color:#555;">Truck: ${req.truck_plate} (${req.truck_type || "-"})</div>`
+        ? `<div class="gen-6">Truck: ${req.truck_plate} (${req.truck_type || "-"})</div>`
         : "";
 
     let confirmBlock = "";
@@ -850,21 +941,21 @@ function renderTracker(req, index){
         if(req.confirmation_status === "pending"){
             confirmBlock = `
             <button type="button" onclick="confirmCompletion(${req.id})"
-                style="margin-top:10px;width:100%;padding:10px;background:#2e7d32;color:white;border:none;border-radius:8px;font-weight:bold;cursor:pointer;">
+                class="gen-7">
                 Confirm Job Was Completed
             </button>`;
         } else if(req.resident_comment){
             confirmBlock = `
-            <div style="margin-top:10px;padding:10px 15px;background:#f1f8e9;border-radius:8px;font-size:13px;color:#33691e;">
+            <div class="gen-8">
                 <b>Your feedback:</b> ${req.resident_comment}
             </div>`;
         } else {
             confirmBlock = `
-            <div style="margin-top:10px;display:flex;gap:8px;">
+            <div class="gen-9">
                 <input type="text" id="comment-${req.id}" placeholder="Leave feedback (optional)"
-                    style="flex:1;padding:8px;border:1px solid #ddd;border-radius:6px;">
+                    class="gen-10">
                 <button type="button" onclick="submitComment(${req.id})"
-                    style="padding:8px 14px;background:#1565c0;color:white;border:none;border-radius:6px;cursor:pointer;">
+                    class="gen-11">
                     Send
                 </button>
             </div>`;
@@ -874,14 +965,14 @@ function renderTracker(req, index){
     let paymentNote = "";
     if(step === 4 && req.confirmation_status !== "pending"){
         paymentNote = req.paymentStatus === "pending_confirmation"
-            ? `<div style="margin-top:8px;padding:8px 12px;background:#fff3e0;border-radius:6px;font-size:12px;color:#e65100;">Payment claimed by driver — waiting for operator approval.</div>`
-            : `<div style="margin-top:8px;padding:8px 12px;background:#fff3e0;border-radius:6px;font-size:12px;color:#e65100;">Waiting for payment to be settled.</div>`;
+            ? `<div class="gen-12">Payment claimed by driver — waiting for operator approval.</div>`
+            : `<div class="gen-12">Waiting for payment to be settled.</div>`;
     }
 
     return `
         <div class="tracker-req">
             <h4>#${index+1} ${req.service} —
-                <small style="color:#888;">${req.created_at ? new Date(req.created_at).toLocaleDateString() : ""}</small>
+                <small class="gen-13">${req.created_at ? new Date(req.created_at).toLocaleDateString() : ""}</small>
             </h4>
             <div class="progress-steps">${stepsHTML}</div>
             ${req.assigned_driver ? `
@@ -889,7 +980,7 @@ function renderTracker(req, index){
                 ${t.driver}: ${req.assigned_driver}
                 ${req.status === "completed" ? " — Work Completed!" : " — On the way..."}
             </div>` : `
-            <div style="margin-top:12px;padding:10px 15px;background:#fff3e0;border-radius:8px;font-size:13px;color:#e65100;">
+            <div class="gen-14">
                 ${t.noDriver}
             </div>`}
             ${truckLine}
