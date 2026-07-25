@@ -92,12 +92,16 @@ async function ensureTables() {
 // ensurePaymentMethodColumn, generalized so ~10 new columns across 3 tables
 // don't need one copy-pasted function each).
 async function ensureColumns(table, columns) {
+  // Alias explicitly — MySQL's own casing for unaliased information_schema
+  // columns varies by server version/config (observed lowercase locally,
+  // uppercase COLUMN_NAME on Railway's MySQL), which crashed startup in
+  // production. An explicit lowercase alias pins the returned key regardless.
   const [existing] = await pool.query(
-    `SELECT column_name FROM information_schema.columns
+    `SELECT column_name AS col_name FROM information_schema.columns
      WHERE table_schema = DATABASE() AND table_name = ?`,
     [table]
   )
-  const existingNames = new Set(existing.map((row) => row.column_name.toLowerCase()))
+  const existingNames = new Set(existing.map((row) => row.col_name.toLowerCase()))
 
   for (const { name, definition } of columns) {
     if (!existingNames.has(name.toLowerCase())) {
